@@ -1,0 +1,96 @@
+{
+  "name": "games_host",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/games_host/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "compiler": "babel",
+        "outputPath": "dist/apps/games_host",
+        "index": "apps/games_host/src/index.html",
+        "baseHref": "/",
+        "main": "apps/games_host/src/main.ts",
+        "tsConfig": "apps/games_host/tsconfig.app.json",
+        "assets": [
+          "apps/games_host/src/favicon.ico",
+          "apps/games_host/src/assets"
+        ],
+        "styles": ["apps/games_host/src/styles.css"],
+        "scripts": [],
+        "webpackConfig": "apps/games_host/webpack.config.ts",
+        "postcssConfig": "apps/games_host/postcss.config.js"
+      },
+      "configurations": {
+        "development": {
+          "extractLicenses": false,
+          "optimization": false,
+          "sourceMap": true,
+          "vendorChunk": true
+        },
+        "production": {
+          "fileReplacements": [
+            {
+              "replace": "apps/games_host/src/environments/environment.ts",
+              "with": "apps/games_host/src/environments/environment.prod.ts"
+            }
+          ],
+          "optimization": true,
+          "outputHashing": "all",
+          "sourceMap": false,
+          "namedChunks": false,
+          "extractLicenses": true,
+          "vendorChunk": false,
+          "webpackConfig": "apps/games_host/webpack.config.prod.ts"
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/react:module-federation-dev-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "games_host:build",
+        "hmr": true,
+        "port": 4200
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "games_host:build:development"
+        },
+        "production": {
+          "buildTarget": "games_host:build:production",
+          "hmr": false
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "serve-static": {
+      "executor": "@nx/react:module-federation-static-server",
+      "defaultConfiguration": "production",
+      "options": {
+        "serveTarget": "games_host:serve"
+      },
+      "configurations": {
+        "development": {
+          "serveTarget": "games_host:serve:development"
+        },
+        "production": {
+          "serveTarget": "games_host:serve:production"
+        }
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/games_host/jest.config.ts"
+      }
+    }
+  }
+}
