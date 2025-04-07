@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  game_db:
+    image: postgres:15
+    environment:
+      POSTGRES_PASSWORD: dongt
+      POSTGRES_DB: gomoku
+      POSTGRES_USER: dongt
+    container_name: game_db
+    ports:
+      - '5434:5432'
+    volumes:
+      - game_db_data:/var/lib/postgresql/data
+
+volumes:
+  game_db_data:
