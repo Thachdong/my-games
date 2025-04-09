@@ -1,6 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn, ManyToMany, OneToMany } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Game } from '../../game/entities/game.entity';
+import { TournamentRank } from './tournamentRank.entity';
 
 @Entity('tournament')
 export class Tournament {
@@ -20,6 +21,9 @@ export class Tournament {
   @Column()
   @ManyToMany(() => User, (user) => user.games)
   players: User[];
+
+  @OneToMany(() => TournamentRank, (rank) => rank.tournament)
+  ranks: TournamentRank[];
 
   @Column()
   startTime: Date;
