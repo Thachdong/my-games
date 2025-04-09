@@ -1,24 +1,32 @@
 import {
   Controller,
   Get,
-  HttpException,
   HttpStatus,
   Patch,
+  Query,
+  ParseIntPipe,
+  Param,
+  ParseUUIDPipe,
+  Body
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UserService } from './user.service';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { GetUserDto } from './dto/get-user.dto';
 
 @ApiTags('user')
 @Controller('user')
 export class UserController {
+  constructor(private readonly _userService: UserService) {}
   /**
    * Find all user
    * Authorize by: [admin]
    */
   @ApiOperation({ summary: 'Get users with paginate' })
-  @ApiResponse({ status: 200, description: 'Return user with paginate' })
+  @ApiResponse({ status: 200, description: 'Return user with paginate', type: GetUserDto })
   @Get()
-  findAll() {
-    return [];
+  async findAll(@Query('page', ParseIntPipe) page: number, @Query('limit', ParseIntPipe) limit: number) {
+    return this._userService.getAll(page, limit);
   }
 
   /**
@@ -30,8 +38,8 @@ export class UserController {
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiParam({ name: 'id', description: 'User Id' })
   @Get(':id')
-  findById() {
-    throw new HttpException('user not found', HttpStatus.NOT_FOUND);
+  findById(@Param('id', ParseUUIDPipe) id: string) {
+    return this._userService.getUserById(id)
   }
 
   /**
@@ -46,7 +54,7 @@ export class UserController {
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid data' })
   @Patch('profile')
-  update() {
-    throw new HttpException('user not found', HttpStatus.BAD_REQUEST);
+  update(@Body() data: UpdateUserDto, @Param('id', ParseUUIDPipe) id: string) {
+    return this._userService.updateUser(id, data)
   }
 }
