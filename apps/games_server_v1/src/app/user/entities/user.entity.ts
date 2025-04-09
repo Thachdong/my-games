@@ -1,6 +1,7 @@
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Exclude } from "class-transformer";
-import { Game } from "../../game/entities/game.entity";
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Exclude } from 'class-transformer';
+import { Game } from '../../game/entities/game.entity';
+import { AbstractEntity } from "../../../common/abstractEntity"
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -8,10 +9,7 @@ export enum UserRole {
 }
 
 @Entity('user')
-export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
+export class User extends AbstractEntity {
   @Column({ unique: true })
   email: string;
 
@@ -21,21 +19,18 @@ export class User {
   @Column()
   @Exclude({ toPlainOnly: true })
   password: string;
-  
-  @Column()
+
+  @Column({ default: false })
   isActive: boolean;
 
-  @Column()
+  @Column({ default: false })
   isEmailVerified: boolean;
 
-  @Column()
-  activationToken: string;
-
-  @Column()
-  roles: UserRole[];
-
-  @Column()
+  @Column({ nullable: true })
   verificationToken: string;
+
+  @Column({ type: 'varchar', array: true, default: [] })
+  roles: UserRole[];
 
   @Column({ nullable: true })
   avatar?: string;
@@ -57,10 +52,4 @@ export class User {
 
   @ManyToMany(() => Game, (game) => game.players)
   games: Game[];
-
-  @Column()
-  createdAt: Date;
-
-  @Column()
-  updatedAt: Date;
 }

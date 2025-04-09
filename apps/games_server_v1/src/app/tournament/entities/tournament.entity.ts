@@ -1,25 +1,22 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToMany, OneToMany } from 'typeorm';
+import { Column, Entity, ManyToMany, OneToMany, JoinTable } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Game } from '../../game/entities/game.entity';
-import { TournamentRank } from './tournamentRank.entity';
+import { TournamentRank } from './tournament-rank.entity';
+import { AbstractEntity } from '../../../common/abstractEntity'
 
 @Entity('tournament')
-export class Tournament {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
+export class Tournament extends AbstractEntity {
   @Column()
   title: string;
 
   @Column()
   creatorId: string;
 
-  @Column()
   @OneToMany(() => Game, (game) => game.tournament)
   games: Game[];
 
-  @Column()
   @ManyToMany(() => User, (user) => user.games)
+  @JoinTable()
   players: User[];
 
   @OneToMany(() => TournamentRank, (rank) => rank.tournament)
@@ -30,10 +27,4 @@ export class Tournament {
 
   @Column()
   endTime: Date;
-
-  @Column()
-  createdAt: Date;
-
-  @Column()
-  updatedAt: Date;
 }

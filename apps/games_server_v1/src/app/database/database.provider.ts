@@ -1,9 +1,10 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
+import { EProvide } from '../constants';
 
 export const databaseProvider = [
   {
-    provide: 'DATABASE_CONNECTION',
+    provide: EProvide.DATA_SOURCE,
     useFactory: async (configService: ConfigService) => {
       const options: DataSourceOptions = {
         type: 'postgres',
@@ -12,7 +13,7 @@ export const databaseProvider = [
         username: configService.get('DB_USERNAME') || 'dongt',
         password: configService.get('DB_PASSWORD') || 'dongt',
         database: configService.get('DB_NAME') || 'gomoku_v1',
-        entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+        entities: [__dirname + '/../**/*.entity.{ts,js}'],
         synchronize: false,
       };
 

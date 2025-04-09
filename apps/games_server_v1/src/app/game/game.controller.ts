@@ -41,7 +41,7 @@ export class GameController {
   @ApiResponse({ status: HttpStatus.CREATED, description: 'Move added successfully' })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid data provided' })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized access' })
-  @Post([':id', 'move'])
+  @Post(':id/move')
   addMove() {
     throw new HttpException('Bad request', HttpStatus.BAD_REQUEST);
   }

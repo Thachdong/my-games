@@ -1,18 +1,16 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Move } from './move.entity';
+import { AbstractEntity } from '../../../common/abstractEntity'
 import { Tournament } from '../../tournament/entities/tournament.entity';
 
 @Entity('game')
-export class Game {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
-  @Column()
+export class Game extends AbstractEntity {
   @ManyToMany(() => User, (user) => user.games)
+  @JoinTable()
   players: User[];
 
-  @Column({ nullable: true })
+  @ManyToOne(() => Tournament, (tournament) => tournament.games, { nullable: true })
   tournament?: Tournament;
 
   @Column()
@@ -22,7 +20,7 @@ export class Game {
   endTime: Date;
 
   @Column()
-  winner: User;
+  winnerId: string;
 
   @Column()
   isDraw: boolean;
@@ -33,12 +31,6 @@ export class Game {
   @Column()
   loserScoreGain: number;
 
-  @Column()
+  @OneToMany(() => Move, (move) => move.game)
   moves: Move[];
-
-  @Column()
-  createdAt: Date;
-
-  @Column()
-  updatedAt: Date;
 }

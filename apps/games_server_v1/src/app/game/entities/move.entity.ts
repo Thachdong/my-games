@@ -1,17 +1,15 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne } from "typeorm";
 import { Game } from "./game.entity";
+import { AbstractEntity } from "../../../common/abstractEntity";
 
 @Entity('move')
-export class Move {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-  
+export class Move extends AbstractEntity {
   @Column()
   userId: string;
 
-  @Column()
   @ManyToOne(() => Game, (game) => game.moves)
   game: Game;
+
   @Column()
   timestamp: Date;
 
@@ -20,10 +18,4 @@ export class Move {
 
   @Column()
   positionY: number;
-
-  @Column()
-  createdAt: Date;
-
-  @Column()
-  updatedAt: Date;
 }

@@ -1,17 +1,9 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { Tournament } from './tournament.entity';
+import { AbstractEntity } from '../../../common/abstractEntity';
 
 @Entity('tournament_rank')
-export class TournamentRank {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
+export class TournamentRank extends AbstractEntity {
   @OneToOne(() => Tournament, (tournament) => tournament.ranks)
   @JoinColumn()
   tournament: Tournament;
@@ -23,11 +15,5 @@ export class TournamentRank {
   rankNo: number;
 
   @Column()
-  score: number
-
-  @Column()
-  createdAt: Date;
-
-  @Column()
-  updatedAt: Date;
+  score: number;
 }
