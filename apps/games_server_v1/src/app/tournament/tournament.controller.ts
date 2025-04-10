@@ -1,16 +1,26 @@
 import {
+  Body,
   Controller,
-  HttpException,
   HttpStatus,
+  Param,
+  ParseUUIDPipe,
   Patch,
   Post,
-  Put,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { TournamentService } from './tournament.service';
+import { CreateTournamentDto } from './dto/create-tournament.dto';
+import {
+  UpdateTournamentTitleDto,
+  TournamentPlayerDto,
+} from './dto/update-tournament.dto';
+import { UpdateTournamentRankDto } from './dto/update-tournament-rank.dto';
 
 @ApiTags('tournament')
 @Controller('tournament')
 export class TournamentController {
+  constructor(private readonly _tournamentService: TournamentService) {}
+
   /**
    * Create tournament
    */
@@ -32,14 +42,14 @@ export class TournamentController {
     description: 'Unauthorized access',
   })
   @Post()
-  create() {
-    throw new HttpException('Bad request', HttpStatus.BAD_REQUEST);
+  create(@Body() data: CreateTournamentDto) {
+    this._tournamentService.create(data);
   }
 
   /**
    * Update tournament
    */
-  @ApiOperation({ summary: 'Update tournament (player join / leave, title)' })
+  @ApiOperation({ summary: 'Update tournament (title)' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Tournament updated successfully',
@@ -56,9 +66,68 @@ export class TournamentController {
     status: HttpStatus.FORBIDDEN,
     description: 'Access forbidden',
   })
-  @Patch(':id')
-  updateTournament() {
-    throw new HttpException('Bad request', HttpStatus.BAD_REQUEST);
+  @Patch(':id/title')
+  updateTournament(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() data: UpdateTournamentTitleDto
+  ) {
+    this._tournamentService.updateTitle(id, data.title);
+  }
+
+  /**
+   * Update tournament
+   */
+  @ApiOperation({ summary: 'Player join tournament' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Tournament updated successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid data provided',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized access',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Access forbidden',
+  })
+  @Patch(':id/join')
+  playerJoin(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() data: TournamentPlayerDto
+  ) {
+    this._tournamentService.playerJoin(id, data.userId);
+  }
+
+  /**
+   * Update tournament
+   */
+  @ApiOperation({ summary: 'Update tournament (title)' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Tournament updated successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid data provided',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized access',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Access forbidden',
+  })
+  @Patch(':id/leave')
+  playerLeave(
+    @Param('id', ParseUUIDPipe) id: string,
+    data: TournamentPlayerDto
+  ) {
+    this._tournamentService.playerLeave(id, data.userId);
   }
 
   /**
@@ -81,8 +150,11 @@ export class TournamentController {
     status: HttpStatus.FORBIDDEN,
     description: 'Access forbidden',
   })
-  @Put(':id')
-  updateRank() {
-    throw new HttpException('Bad request', HttpStatus.BAD_REQUEST);
+  @Patch(':rankId/rank')
+  updateRank(
+    @Param('rankId', ParseUUIDPipe) id: string,
+    @Body() data: UpdateTournamentRankDto
+  ) {
+    this._tournamentService.updateRank(id, data);
   }
 }
