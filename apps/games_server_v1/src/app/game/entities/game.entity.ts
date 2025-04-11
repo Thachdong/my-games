@@ -11,24 +11,24 @@ export class Game extends AbstractEntity {
   players: User[];
 
   @ManyToOne(() => Tournament, (tournament) => tournament.games, { nullable: true })
-  tournament?: Tournament;
+  tournament: Tournament;
 
-  @Column()
+  @Column({ nullable: true })
   startTime: Date;
 
-  @Column()
+  @Column({ nullable: true })
   endTime: Date;
 
-  @Column()
+  @Column({ nullable: true })
   winnerId: string;
 
-  @Column()
+  @Column({ nullable: true })
   isDraw: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   winnerScoreGain: number;
 
-  @Column()
+  @Column({ nullable: true })
   loserScoreGain: number;
 
   @OneToMany(() => Move, (move) => move.game)
