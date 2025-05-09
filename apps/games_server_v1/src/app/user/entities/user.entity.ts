@@ -1,7 +1,7 @@
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToMany } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Game } from '../../game/entities/game.entity';
-import { AbstractEntity } from "../../../common/abstractEntity"
+import { AbstractEntity } from "../../../common/abstract-entity"
 
 export enum UserRole {
   ADMIN = 'admin',

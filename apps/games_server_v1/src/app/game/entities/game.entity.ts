@@ -1,7 +1,7 @@
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Move } from './move.entity';
-import { AbstractEntity } from '../../../common/abstractEntity'
+import { AbstractEntity } from '../../../common/abstract-entity'
 import { Tournament } from '../../tournament/entities/tournament.entity';
 
 @Entity('game')

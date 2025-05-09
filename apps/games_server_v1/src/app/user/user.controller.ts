@@ -9,21 +9,22 @@ import {
   ParseUUIDPipe,
   Body
 } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { GetUserDto } from './dto/get-user.dto';
+import { GenericApiResponse } from '../../decorators/generic-api-response.decorator';
 
 @ApiTags('user')
 @Controller('user')
 export class UserController {
   constructor(private readonly _userService: UserService) {}
   /**
-   * Find all user
+  @GenericApiResponse(GetUserDtoArray, { status: 200, description: 'Return user with paginate' })
    * Authorize by: [admin]
    */
   @ApiOperation({ summary: 'Get users with paginate' })
-  @ApiResponse({ status: 200, description: 'Return user with paginate', type: GetUserDto })
+  @GenericApiResponse({ status: 200, description: 'Return user with paginate' }, [ GetUserDto ])
   @Get()
   async findAll(@Query('page', ParseIntPipe) page: number, @Query('limit', ParseIntPipe) limit: number) {
     return this._userService.getAll(page, limit);
@@ -34,8 +35,8 @@ export class UserController {
    * Authorize by: [admin, owner]
    */
   @ApiOperation({ summary: 'Get user by Id' })
-  @ApiResponse({ status: 200, description: 'Return the user' })
-  @ApiResponse({ status: 404, description: 'User not found' })
+  @GenericApiResponse({ status: 200, description: 'Return the user' }, GetUserDto)
+  @GenericApiResponse({ status: 404, description: 'User not found' })
   @ApiParam({ name: 'id', description: 'User Id' })
   @Get(':id')
   findById(@Param('id', ParseUUIDPipe) id: string) {
@@ -47,12 +48,12 @@ export class UserController {
    * Authorize by: [admin, owner]
    */
   @ApiOperation({ summary: 'Update user profile' })
-  @ApiResponse({
+  @GenericApiResponse({
     status: HttpStatus.OK,
     description: 'User update successfully',
   })
-  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid data' })
+  @GenericApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
+  @GenericApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid data' })
   @Patch('profile')
   update(@Body() data: UpdateUserDto, @Param('id', ParseUUIDPipe) id: string) {
     return this._userService.updateUser(id, data)

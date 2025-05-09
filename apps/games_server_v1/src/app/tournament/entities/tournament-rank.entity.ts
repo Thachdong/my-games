@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { Tournament } from './tournament.entity';
-import { AbstractEntity } from '../../../common/abstractEntity';
+import { AbstractEntity } from '../../../common/abstract-entity';
 
 @Entity('tournament_rank')
 export class TournamentRank extends AbstractEntity {
