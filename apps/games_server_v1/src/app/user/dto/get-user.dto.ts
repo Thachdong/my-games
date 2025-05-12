@@ -14,11 +14,6 @@ export class GetUserDto {
   @IsNotEmpty()
   username: string;
 
-  @ApiProperty({ example: 'strongPassword123', required: true })
-  @IsString()
-  @IsNotEmpty()
-  password: string;
-
   @ApiProperty({ example: 'admin', required: true })
   @IsString()
   roles: string[];

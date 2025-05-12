@@ -5,7 +5,7 @@ import {
   ApiResponseOptions,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { HttpResponse } from '../common/http-response.dto';
+import { HttpResponse } from '../common/http-response';
 
 export function GenericApiResponse(
   params: Omit<ApiResponseOptions, 'schema' | 'type'> = {},
