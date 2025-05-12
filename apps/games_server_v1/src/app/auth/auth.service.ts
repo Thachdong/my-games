@@ -7,9 +7,77 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { AuthenticatedUserDto } from './dto/authenticated-user.dto';
+import { GetUserDto } from '../user/dto/get-user.dto';
+
+interface IAuthService {
+  /**
+   * Register a new user
+   */
+  register(data: RegisterDto): Promise<User>;
+  /**
+   * Login
+   * @param data
+   * @returns AuthenticatedUserDto or void
+   */
+  login(data: LoginDto): Promise<AuthenticatedUserDto | void>;
+  /**
+   * Get user by id
+   * @param id
+   * @returns User
+   */
+  logout(accessToken: string): Promise<void>;
+  /**
+   * Verify email
+   * @param userId
+   * @param token
+   * @implements
+   * - Check if user exists
+   * - Check if token is valid
+   * - Update user isEmailVerified to true
+   * @returns void
+   */
+  activate(userId: string, token: string): Promise<void>;
+  /**
+   * Forgot password
+   * @param email
+   * @implements
+   * - Check if user exists
+   * - Generate reset password token
+   * - Send email with reset password link
+   * @returns void
+   */
+  forgotPassword(email: string): Promise<void>;
+  /**
+   * Reset password
+   * @param userId
+   * @implements
+   * - Check if user exists
+   * - Generate random password
+   * - Hash password
+   * - Update user password
+   * @returns random password
+   */
+  resetPassword(resetPasswordToken: string): Promise<string>;
+  /**
+   * Validate user
+   * @param email
+   * @param password
+   * @returns User or null
+   */
+  validateUser(
+    email: string,
+    password: string
+  ): Promise<User | null>;
+  /**
+   * Get user by id
+   * @param id
+   * @returns User
+   */
+  getUserById(id: string): Promise<GetUserDto | void>;
+}
 
 @Injectable()
-export class AuthService {
+export class AuthService implements IAuthService {
   constructor(
     @InjectRepository(User) private readonly _userRepository: Repository<User>,
     private readonly _jwtService: JwtService
@@ -23,7 +91,7 @@ export class AuthService {
       Math.random().toString(36).substring(2, 15) +
       Math.random().toString(36).substring(2, 15)
     );
-  }
+}
 
   /**
    * Hashing password
@@ -48,9 +116,6 @@ export class AuthService {
     return await this._jwtService.sign(payload);
   }
 
-  /**
-   * Register a new user
-   */
   async register(data: RegisterDto): Promise<User> {
     // Hash password
     const hashedPassword = await this._hashPassword(data.password);
@@ -67,21 +132,30 @@ export class AuthService {
     return user;
   }
 
-  async login(data: LoginDto): Promise<AuthenticatedUserDto | void> {
-    // Get user by email
+  async validateUser(email: string, password: string): Promise<User | null> {
     const user = await this._userRepository.findOne({
-      where: { email: data.email },
+      where: { email },
     });
 
     if (!user) {
-      throw new HttpException('Invalid credentials!', HttpStatus.UNAUTHORIZED);
+      return null;
     }
 
-    // Verify password
-    const isPasswordValid = await bcrypt.compare(data.password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      throw new HttpException('Invalid credentials!', HttpStatus.UNAUTHORIZED);
+      return null;
+    }
+
+    return user;
+  }
+
+  async login(data: LoginDto): Promise<AuthenticatedUserDto | void> {
+    // Get user by email
+    const user = await this.validateUser(data.email, data.password);
+
+    if (!user) {
+      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
     }
 
     // Generate JWT token
@@ -126,15 +200,6 @@ export class AuthService {
     await this._userRepository.save(user);
   }
 
-  /**
-   * Forgot password
-   * @param email
-   * @implements
-   * - Check if user exists
-   * - Generate reset password token
-   * - Send email with reset password link
-   * @returns void
-   */
   async forgotPassword(email: string): Promise<void> {
     const user = await this._userRepository.findOne({
       where: { email },
@@ -151,16 +216,6 @@ export class AuthService {
     console.log("TODO: Send email with reset password link", resetPasswordToken);
   }
 
-  /**
-   * Reset password
-   * @param userId
-   * @implements
-   * - Check if user exists
-   * - Generate random password
-   * - Hash password
-   * - Update user password
-   * @returns random password
-   */
   async resetPassword(resetPasswordToken: string): Promise<string> {
     const payload = await this._jwtService.decode(resetPasswordToken);
 
@@ -181,5 +236,17 @@ export class AuthService {
     await this._userRepository.save(user);
 
     return randomPassword;
+  }
+
+  async getUserById(id: string): Promise<GetUserDto | void> {
+    const user = await this._userRepository.findOne({
+      where: { id },
+    })
+
+    if (!user) {
+      throw new HttpException(`User with ID "${id}" does not exist!`, HttpStatus.BAD_REQUEST);
+    }
+
+    return user;
   }
 }

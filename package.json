@@ -56,6 +56,7 @@
     "postcss": "8.4.38",
     "prettier": "^2.6.2",
     "react-refresh": "^0.10.0",
+    "run-script-webpack-plugin": "^0.2.3",
     "tailwindcss": "3.4.3",
     "ts-jest": "^29.1.0",
     "ts-node": "10.9.1",
@@ -95,5 +96,8 @@
     "rxjs": "^7.8.0",
     "socket.io": "^4.8.1",
     "typeorm": "^0.3.22"
+  },
+  "volta": {
+    "node": "20.19.1"
   }
 }

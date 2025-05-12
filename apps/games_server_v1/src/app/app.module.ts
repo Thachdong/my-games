@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { GameModule } from './game/game.module';
 import { TournamentModule } from './tournament/tournament.module';
@@ -9,6 +11,8 @@ import { Game } from './game/entities/game.entity';
 import { Tournament } from './tournament/entities/tournament.entity';
 import { TournamentRank } from './tournament/entities/tournament-rank.entity';
 import { Move } from './game/entities/move.entity';
+import { JwtGuard } from './auth/guards/jwt.guard';
+import { JwtStrategy } from './auth/passport-strategies/jwt.strategy';
 
 @Module({
   imports: [
@@ -29,10 +33,17 @@ import { Move } from './game/entities/move.entity';
       }),
     }),
     TypeOrmModule,
+    AuthModule,
     UserModule,
     GameModule,
     TournamentModule,
   ],
-  exports: []
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtGuard,
+    },
+    JwtStrategy,
+  ],
 })
 export class AppModule {}

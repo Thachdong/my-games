@@ -112,5 +112,6 @@
         "previewTargetName": "preview"
       }
     }
-  ]
+  ],
+  "useDaemonProcess": true
 }

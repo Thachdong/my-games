@@ -1,5 +1,6 @@
 const { NxAppWebpackPlugin } = require('@nx/webpack/app-plugin');
 const { join } = require('path');
+const { RunScriptWebpackPlugin } = require('run-script-webpack-plugin');
 
 module.exports = {
   output: {
@@ -16,5 +17,6 @@ module.exports = {
       outputHashing: 'none',
       generatePackageJson: true,
     }),
+    new RunScriptWebpackPlugin({ name: 'main.js', autoRestart: true })
   ],
 };

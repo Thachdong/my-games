@@ -11,6 +11,13 @@
     }
   ],
   "compilerOptions": {
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@common": ["/common/*"],
+      "@types": ["./types/*"],
+      "@decorators": ["./decorators/*"],
+      "@app": ["./app/*"]
+    }
   }
 }
