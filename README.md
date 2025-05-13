@@ -75,3 +75,76 @@ And join the Nx community:
 - [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
 - [Our Youtube channel](https://www.youtube.com/@nxdevtools)
 - [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+
+
+1. user:
+	id
+	username
+	email
+	password
+	isActive
+	activateToken
+	avatar
+	score
+	gamePlayed
+	tounamentJoined
+	messages
+	role: [admin, player, partner]
+
+2. game
+	id
+	players
+	startAt
+	endAt
+	result
+	moves
+	messages
+	scoreGranted
+
+3. move
+	id
+	owner
+	timestamp
+	row
+	col
+	
+4. tournament
+	id
+	title
+	owner
+	startAt
+	endAt
+	players
+	games
+	messages
+	result: tournamentRank
+
+5. tournamentRank
+	id
+	tournamentId
+	player
+	score
+	rank	
+
+6. message
+	id
+	sender
+	message
+	timestamp
+	room
+
+Services:
+- send email: activate account, tournament schedule
+- real time message (chat, ranking, game list, playing game)
+
+Controllers
+- auth (/login, /register, /activate?token=token, /rest-password)
+- chat (/messages?type=public, tournamentId, roomId, /game-list)
+- user (/profile)
+- game (/create, /gameId, /all)
+
+
+
+
+
+
