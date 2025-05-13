@@ -4,22 +4,22 @@ import * as bcrypt from 'bcrypt';
 import { User } from '../user/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { AuthenticatedUserDto } from './dto/authenticated-user.dto';
 import { GetUserDto } from '../user/dto/get-user.dto';
+import { TJwtPayload } from 'types/jwt';
 
 interface IAuthService {
   /**
    * Register a new user
    */
-  register(data: RegisterDto): Promise<User>;
+  register(data: RegisterDto): Promise<GetUserDto>;
   /**
    * Login
    * @param data
    * @returns AuthenticatedUserDto or void
    */
-  login(data: LoginDto): Promise<AuthenticatedUserDto | void>;
+  login(user: GetUserDto): Promise<AuthenticatedUserDto | void>;
   /**
    * Get user by id
    * @param id
@@ -64,10 +64,7 @@ interface IAuthService {
    * @param password
    * @returns User or null
    */
-  validateUser(
-    email: string,
-    password: string
-  ): Promise<User | null>;
+  validateUser(email: string, password: string): Promise<User | null>;
   /**
    * Get user by id
    * @param id
@@ -91,7 +88,7 @@ export class AuthService implements IAuthService {
       Math.random().toString(36).substring(2, 15) +
       Math.random().toString(36).substring(2, 15)
     );
-}
+  }
 
   /**
    * Hashing password
@@ -110,13 +107,16 @@ export class AuthService implements IAuthService {
    * @param email
    * @returns Promise<string>
    */
-  private async _generateJwtToken(userId: string, email: string): Promise<string> {
+  private async _generateJwtToken(
+    userId: string,
+    email: string
+  ): Promise<string> {
     const payload = { sub: userId, email };
 
     return await this._jwtService.sign(payload);
   }
 
-  async register(data: RegisterDto): Promise<User> {
+  async register(data: RegisterDto): Promise<GetUserDto> {
     // Hash password
     const hashedPassword = await this._hashPassword(data.password);
 
@@ -150,21 +150,12 @@ export class AuthService implements IAuthService {
     return user;
   }
 
-  async login(data: LoginDto): Promise<AuthenticatedUserDto | void> {
-    // Get user by email
-    const user = await this.validateUser(data.email, data.password);
-
-    if (!user) {
-      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
-    }
-
-    // Generate JWT token
+  async login(user: GetUserDto): Promise<AuthenticatedUserDto | void> {
     const accessToken = await this._generateJwtToken(user.id, user.email);
 
-    // Return user data and token
     return {
-      ...user,
       accessToken,
+      ...user,
     };
   }
 
@@ -181,10 +172,12 @@ export class AuthService implements IAuthService {
     console.log(`Token invalidated: ${accessToken}`);
   }
 
-  async activate(userId: string, token: string): Promise<void> {
+  async activate(token: string): Promise<void> {
+    const payload = await this._jwtService.decode(token);
+
     const user = await this._userRepository.findOne({
-      where: { id: userId },
-    })
+      where: { id: payload.sub },
+    });
 
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
@@ -203,17 +196,23 @@ export class AuthService implements IAuthService {
   async forgotPassword(email: string): Promise<void> {
     const user = await this._userRepository.findOne({
       where: { email },
-    })
+    });
 
     if (!user) {
-      throw new HttpException(`User with email (${email}) not found`, HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        `User with email (${email}) not found`,
+        HttpStatus.NOT_FOUND
+      );
     }
 
     // Generate reset password token
     const resetPasswordToken = this._generateJwtToken(user.id, user.email);
 
     // Send email with reset password link
-    console.log("TODO: Send email with reset password link", resetPasswordToken);
+    console.log(
+      'TODO: Send email with reset password link',
+      resetPasswordToken
+    );
   }
 
   async resetPassword(resetPasswordToken: string): Promise<string> {
@@ -221,7 +220,7 @@ export class AuthService implements IAuthService {
 
     const user = await this._userRepository.findOne({
       where: { id: payload.sub },
-    })
+    });
 
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
@@ -241,10 +240,13 @@ export class AuthService implements IAuthService {
   async getUserById(id: string): Promise<GetUserDto | void> {
     const user = await this._userRepository.findOne({
       where: { id },
-    })
+    });
 
     if (!user) {
-      throw new HttpException(`User with ID "${id}" does not exist!`, HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        `User with ID "${id}" does not exist!`,
+        HttpStatus.BAD_REQUEST
+      );
     }
 
     return user;
