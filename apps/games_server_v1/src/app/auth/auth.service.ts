@@ -7,70 +7,7 @@ import { RegisterDto } from './dto/register.dto';
 import { JwtService } from '@nestjs/jwt';
 import { AuthenticatedUserDto } from './dto/authenticated-user.dto';
 import { GetUserDto } from '../user/dto/get-user.dto';
-
-interface IAuthService {
-  /**
-   * Register a new user
-   */
-  register(data: RegisterDto): Promise<GetUserDto>;
-  /**
-   * Login
-   * @param data
-   * @returns AuthenticatedUserDto or void
-   */
-  login(user: GetUserDto): Promise<AuthenticatedUserDto | void>;
-  /**
-   * Get user by id
-   * @param id
-   * @returns User
-   */
-  logout(accessToken: string): Promise<void>;
-  /**
-   * Verify email
-   * @param userId
-   * @param token
-   * @implements
-   * - Check if user exists
-   * - Check if token is valid
-   * - Update user isEmailVerified to true
-   * @returns void
-   */
-  activate(userId: string, token: string): Promise<void>;
-  /**
-   * Forgot password
-   * @param email
-   * @implements
-   * - Check if user exists
-   * - Generate reset password token
-   * - Send email with reset password link
-   * @returns void
-   */
-  forgotPassword(email: string): Promise<void>;
-  /**
-   * Reset password
-   * @param userId
-   * @implements
-   * - Check if user exists
-   * - Generate random password
-   * - Hash password
-   * - Update user password
-   * @returns random password
-   */
-  resetPassword(resetPasswordToken: string): Promise<string>;
-  /**
-   * Validate user
-   * @param email
-   * @param password
-   * @returns User or null
-   */
-  validateUser(email: string, password: string): Promise<User | null>;
-  /**
-   * Get user by id
-   * @param id
-   * @returns User
-   */
-  getUserById(id: string): Promise<GetUserDto | void>;
-}
+import { IAuthService } from './interfaces/auth-service.interface';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -80,7 +17,10 @@ export class AuthService implements IAuthService {
   ) {}
 
   /**
-   * Generate verification token
+   * Description: Generate verification token
+   * @param: void
+   * @returns: string
+   * @example: 'abc123xyz456'
    */
   private _generateVerificationToken(): string {
     return (
@@ -90,8 +30,8 @@ export class AuthService implements IAuthService {
   }
 
   /**
-   * Hashing password
-   * @param password
+   * Description: Hashing password
+   * @param password: string
    * @returns Promise<string>
    */
   private async _hashPassword(password: string): Promise<string> {
@@ -101,7 +41,7 @@ export class AuthService implements IAuthService {
   }
 
   /**
-   * Generate jwt token
+   * Description: Generate jwt token
    * @param userId
    * @param email
    * @returns Promise<string>
@@ -131,7 +71,7 @@ export class AuthService implements IAuthService {
     return user;
   }
 
-  async validateUser(email: string, password: string): Promise<User | null> {
+  async validateUser(email: string, password: string): Promise<GetUserDto | null> {
     const user = await this._userRepository.findOne({
       where: { email },
     });
@@ -159,15 +99,6 @@ export class AuthService implements IAuthService {
   }
 
   async logout(accessToken: string): Promise<void> {
-    // Invalidate the token (implementation depends on your token management strategy)
-    // For example, you could maintain a blacklist of invalidated tokens in a database or cache.
-    // Here, we'll assume a token blacklist service or similar mechanism is in place.
-    // Example:
-    // await this._tokenBlacklistService.addToBlacklist(accessToken);
-
-    // If no token blacklist is used, JWTs are stateless and cannot be invalidated server-side.
-    // In that case, you can only rely on token expiration.
-
     console.log(`Token invalidated: ${accessToken}`);
   }
 

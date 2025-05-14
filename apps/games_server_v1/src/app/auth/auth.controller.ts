@@ -24,7 +24,15 @@ import { LocalAuthGuard } from 'app/auth/guards/local-auth.guard';
 export class AuthController {
   constructor(private readonly _authService: AuthService) {}
 
-  // #region -- Register --
+  /**
+   * Name: register
+   * Description: Register a new user
+   * @param data: RegisterDto - The registration data
+   * @returns Registered user data
+   * Exceptions:
+   * - 201: User registration successful
+   * - 400: Invalid user data
+   */
   @ApiOperation({ summary: 'Register a user' })
   @GenericApiResponse(
     { description: 'User registration successful', status: HttpStatus.CREATED },
@@ -45,9 +53,19 @@ export class AuthController {
       data: user,
     };
   }
-  // #endregion
 
-  // #region -- Login --
+  /**
+   * Name: login
+   * Description: User login to the game
+   * @implements
+   * - Passport local strategy (validate user credentials: email and password and isActive)
+   * - JWT token generation
+   * @param req: LoginDto - The login data
+   * @returns Authenticated user data
+   * Exceptions:
+   * - 200: Login successful
+   * - 401: Unauthorized access
+   */
   @ApiOperation({ summary: 'User login to the game' })
   @ApiBody({ type: LoginDto })
   @GenericApiResponse(
@@ -62,7 +80,6 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Req() req): Promise<HttpResponse<AuthenticatedUserDto | void>> {
-    console.log('Login request:', req.user);
     const user = req.user;
 
     const authenticatedUser = await this._authService.login(user);
@@ -73,9 +90,15 @@ export class AuthController {
       data: authenticatedUser,
     };
   }
-  // #endregion
 
-  // #region -- Logout --
+  /**
+   * Name: logout
+   * Description: User logout from the game
+   * @returns void
+   * Exceptions:
+   * - 200: Logout successful
+   * - 400: Bad request
+   */
   @ApiOperation({ summary: 'User logout from the game' })
   @GenericApiResponse({
     status: HttpStatus.OK,
@@ -89,9 +112,17 @@ export class AuthController {
   async logout() {
     throw new HttpException('Bad request', HttpStatus.BAD_REQUEST);
   }
-  // #endregion
 
-  // #region -- Activate Account --
+  /**
+   * Name: activate new account
+   * Description: Activate a new account
+   * @param token: string - The JWT token for activation (includ: userId)
+   * @returns void
+   * Exceptions:
+   * - 200: User activation successful
+   * - 400: Token has expired
+   * - 401: Unauthorized access
+   */
   @ApiOperation({ summary: 'Activate a new account' })
   @GenericApiResponse({
     status: HttpStatus.OK,
