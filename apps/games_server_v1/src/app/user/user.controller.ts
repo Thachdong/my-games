@@ -4,7 +4,6 @@ import {
   HttpStatus,
   Patch,
   Query,
-  ParseIntPipe,
   Param,
   ParseUUIDPipe,
   Body,
@@ -20,19 +19,18 @@ import { HttpResponse } from '../../common/http-response';
 @Controller('user')
 export class UserController {
   constructor(private readonly _userService: UserService) {}
-  /**
-  @GenericApiResponse(GetUserDtoArray, { status: 200, description: 'Return user with paginate' })
-   * Authorize by: [admin]
-   */
+
   @ApiOperation({ summary: 'Get users with paginate' })
+  @ApiParam({ name: 'page', description: 'Page number for pagination', required: false })
+  @ApiParam({ name: 'limit', description: 'Limit number of users per page', required: false })
   @GenericApiResponse(
     { status: 200, description: 'Return user with paginate' },
     [GetUserDto]
   )
   @Get()
   async findAll(
-    @Query('page', ParseIntPipe) page: number,
-    @Query('limit', ParseIntPipe) limit: number
+    @Query('page') page?: number,
+    @Query('limit') limit?: number
   ): Promise<HttpResponse<GetUserDto[]>> {
     const paginate = await this._userService.getAll(page, limit);
 

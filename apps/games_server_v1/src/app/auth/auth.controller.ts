@@ -6,14 +6,18 @@ import {
   Param,
   Post,
   Req,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RegisterDto } from './dto/register.dto';
 import { HttpResponse } from '../../common/http-response';
 import { AuthService } from './auth.service';
 import { GenericApiResponse } from 'decorators/generic-api-response.decorator';
 import { AuthenticatedUserDto } from 'app/auth/dto/authenticated-user.dto';
 import { GetUserDto } from 'app/user/dto/get-user.dto';
+import { Public } from 'app/auth/decorators/public.decorator';
+import { LoginDto } from 'app/auth/dto/login.dto';
+import { LocalAuthGuard } from 'app/auth/guards/local-auth.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -30,6 +34,7 @@ export class AuthController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid user data',
   })
+  @Public()
   @Post('register')
   async register(@Body() data: RegisterDto): Promise<HttpResponse<GetUserDto>> {
     const user = await this._authService.register(data);
@@ -44,6 +49,7 @@ export class AuthController {
 
   // #region -- Login --
   @ApiOperation({ summary: 'User login to the game' })
+  @ApiBody({ type: LoginDto })
   @GenericApiResponse(
     { status: HttpStatus.OK, description: 'Login successful' },
     AuthenticatedUserDto
@@ -52,8 +58,11 @@ export class AuthController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized access',
   })
+  @Public()
+  @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Req() req): Promise<HttpResponse<AuthenticatedUserDto | void>> {
+    console.log('Login request:', req.user);
     const user = req.user;
 
     const authenticatedUser = await this._authService.login(user);

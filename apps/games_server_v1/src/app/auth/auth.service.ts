@@ -7,7 +7,6 @@ import { RegisterDto } from './dto/register.dto';
 import { JwtService } from '@nestjs/jwt';
 import { AuthenticatedUserDto } from './dto/authenticated-user.dto';
 import { GetUserDto } from '../user/dto/get-user.dto';
-import { TJwtPayload } from 'types/jwt';
 
 interface IAuthService {
   /**
