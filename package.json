@@ -18,7 +18,7 @@
     "@nx/module-federation": "20.7.1",
     "@nx/nest": "^20.7.1",
     "@nx/node": "20.7.1",
-    "@nx/react": "20.7.1",
+    "@nx/react": "^20.1.4",
     "@nx/vite": "20.7.1",
     "@nx/web": "20.7.1",
     "@nx/webpack": "20.7.1",
@@ -33,6 +33,7 @@
     "@testing-library/react": "16.1.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^20.0.0",
+    "@types/nodemailer": "^6.4.17",
     "@types/passport-jwt": "^4.0.1",
     "@types/react": "18.3.1",
     "@types/react-dom": "18.3.0",
@@ -73,6 +74,7 @@
   },
   "dependencies": {
     "@module-federation/enhanced": "^0.9.0",
+    "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/common": "^10.0.2",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^10.0.2",
@@ -88,6 +90,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "moment": "^2.30.1",
+    "nodemailer": "^7.0.3",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
@@ -101,6 +104,6 @@
     "typeorm": "^0.3.22"
   },
   "volta": {
-    "node": "20.19.1"
+    "node": "22.15.1"
   }
 }

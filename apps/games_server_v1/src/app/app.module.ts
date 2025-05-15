@@ -13,6 +13,7 @@ import { TournamentRank } from './tournament/entities/tournament-rank.entity';
 import { Move } from './game/entities/move.entity';
 import { JwtGuard } from './auth/guards/jwt.guard';
 import { JwtStrategy } from './auth/passport-strategies/jwt.strategy';
+import { MailerModule } from 'app/mailer/mailer.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { JwtStrategy } from './auth/passport-strategies/jwt.strategy';
       }),
     }),
     TypeOrmModule,
+    MailerModule,
     AuthModule,
     UserModule,
     GameModule,
