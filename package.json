@@ -11,17 +11,17 @@
     "@eslint/js": "^9.8.0",
     "@nestjs/schematics": "^10.0.1",
     "@nestjs/testing": "^10.0.2",
-    "@nx/eslint": "20.7.1",
+    "@nx/eslint": "^21.0.3",
     "@nx/eslint-plugin": "20.7.1",
     "@nx/jest": "20.7.1",
     "@nx/js": "^20.7.1",
     "@nx/module-federation": "20.7.1",
     "@nx/nest": "^20.7.1",
     "@nx/node": "20.7.1",
-    "@nx/react": "^20.1.4",
-    "@nx/vite": "20.7.1",
+    "@nx/react": "^21.0.3",
+    "@nx/vite": "^21.0.3",
     "@nx/web": "20.7.1",
-    "@nx/webpack": "20.7.1",
+    "@nx/webpack": "^21.0.3",
     "@nx/workspace": "20.7.1",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",
     "@svgr/webpack": "^8.0.1",
@@ -54,7 +54,7 @@
     "jest-environment-node": "^29.7.0",
     "jiti": "2.4.2",
     "jsdom": "~22.1.0",
-    "nx": "20.7.1",
+    "nx": "^21.0.3",
     "postcss": "8.4.38",
     "prettier": "^2.6.2",
     "react-refresh": "^0.10.0",
@@ -102,8 +102,5 @@
     "rxjs": "^7.8.0",
     "socket.io": "^4.8.1",
     "typeorm": "^0.3.22"
-  },
-  "volta": {
-    "node": "22.15.1"
   }
 }

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpException,
   HttpStatus,
   Param,
@@ -132,7 +133,8 @@ export class AuthController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Token has expired',
   })
-  @Post('activate/:token')
+  @Public()
+  @Get('activate/:token')
   async activate(@Param('token') token: string): Promise<HttpResponse<void>> {
     await this._authService.activate(token);
 

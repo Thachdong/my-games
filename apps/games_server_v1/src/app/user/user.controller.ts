@@ -8,7 +8,7 @@ import {
   ParseUUIDPipe,
   Body,
 } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { GetUserDto } from './dto/get-user.dto';
@@ -16,6 +16,7 @@ import { GenericApiResponse } from '../../decorators/generic-api-response.decora
 import { HttpResponse } from '../../common/http-response';
 
 @ApiTags('user')
+@ApiBearerAuth('access-token')
 @Controller('user')
 export class UserController {
   constructor(private readonly _userService: UserService) {}

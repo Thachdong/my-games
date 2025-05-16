@@ -8,12 +8,17 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthenticatedUserDto } from './dto/authenticated-user.dto';
 import { GetUserDto } from '../user/dto/get-user.dto';
 import { IAuthService } from './interfaces/auth-service.interface';
+import { MailerService } from 'app/mailer/mailer.service';
+import { TJwtPayload, TJwtPayloadForActivateAccount } from 'types/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService implements IAuthService {
   constructor(
     @InjectRepository(User) private readonly _userRepository: Repository<User>,
-    private readonly _jwtService: JwtService
+    private readonly _jwtService: JwtService,
+    private readonly _mailerService: MailerService,
+    private readonly _configService: ConfigService,
   ) {}
 
   /**
@@ -56,17 +61,37 @@ export class AuthService implements IAuthService {
   }
 
   async register(data: RegisterDto): Promise<GetUserDto> {
+    // Check if user already exists
+    const existingUser = await this._userRepository.findOne({ where: { email: data.email }})
+
+    if (existingUser) {
+      throw new HttpException(`User with email (${data.email}) already exists`, HttpStatus.BAD_REQUEST);
+    }
+
     // Hash password
     const hashedPassword = await this._hashPassword(data.password);
 
     // Create user
+    const verificationToken = this._generateVerificationToken();
+
     const user = this._userRepository.create({
       ...data,
       password: hashedPassword,
-      verificationToken: this._generateVerificationToken(),
+      verificationToken,
     });
 
     await this._userRepository.save(user);
+
+    // Send verification email
+    const payload: TJwtPayloadForActivateAccount = { sub: user.id, verificationToken }
+    
+    const activateToken = await this._jwtService.sign(payload, {
+      expiresIn: this._configService.get<string>('JWT_ACTIVATION_EXPIRES_IN'), // Token expiration time set to one year
+    })
+
+    const verificationLink = `http://localhost:3000/auth/activate/${activateToken}`;
+
+    await this._mailerService.sendActivateEmail(user.email, verificationLink);
 
     return user;
   }
@@ -103,7 +128,7 @@ export class AuthService implements IAuthService {
   }
 
   async activate(token: string): Promise<void> {
-    const payload = await this._jwtService.decode(token);
+    const payload: TJwtPayloadForActivateAccount = await this._jwtService.decode(token);
 
     const user = await this._userRepository.findOne({
       where: { id: payload.sub },
@@ -113,7 +138,7 @@ export class AuthService implements IAuthService {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    if (user.verificationToken !== token) {
+    if (user.verificationToken !== payload.verificationToken) {
       throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
     }
 
@@ -139,6 +164,12 @@ export class AuthService implements IAuthService {
     const resetPasswordToken = this._generateJwtToken(user.id, user.email);
 
     // Send email with reset password link
+    const payload: TJwtPayload = { sub: user.id, email: user.email };
+
+    const resetToken = await this._jwtService.sign(payload, {
+      expiresIn: '1d',
+    });
+
     console.log(
       'TODO: Send email with reset password link',
       resetPasswordToken

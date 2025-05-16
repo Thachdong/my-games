@@ -9,6 +9,7 @@ export interface IAuthService {
    * @implements
    * - Hash password
    * - Create user
+   * - Send verification email
    * @returns Promise<GetUserDto>
    */
   register(data: RegisterDto): Promise<GetUserDto>;
