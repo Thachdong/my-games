@@ -14,11 +14,12 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { GetUserDto } from './dto/get-user.dto';
 import { GenericApiResponse } from '../../decorators/generic-api-response.decorator';
 import { HttpResponse } from '../../common/http-response';
+import { AuthControllerInterface } from 'app/user/interfaces';
 
 @ApiTags('user')
 @ApiBearerAuth('access-token')
 @Controller('user')
-export class UserController {
+export class UserController implements AuthControllerInterface {
   constructor(private readonly _userService: UserService) {}
 
   @ApiOperation({ summary: 'Get users with paginate' })
@@ -47,10 +48,6 @@ export class UserController {
     };
   }
 
-  /**
-   * Get user by id
-   * Authorize by: [admin, owner]
-   */
   @ApiOperation({ summary: 'Get user by Id' })
   @GenericApiResponse(
     { status: 200, description: 'Return the user' },
@@ -79,10 +76,7 @@ export class UserController {
     };
   }
 
-  /**
-   * Update user profile
-   * Authorize by: [admin, owner]
-   */
+
   @ApiOperation({ summary: 'Update user profile' })
   @GenericApiResponse({
     status: HttpStatus.OK,
@@ -98,8 +92,8 @@ export class UserController {
   })
   @Patch('profile')
   async update(
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() data: UpdateUserDto,
-    @Param('id', ParseUUIDPipe) id: string
   ): Promise<HttpResponse<null>> {
     await this._userService.updateUser(id, data);
 
