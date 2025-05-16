@@ -11,6 +11,8 @@ import { IAuthService } from './interfaces/auth-service.interface';
 import { MailerService } from 'app/mailer/mailer.service';
 import { TJwtPayload, TJwtPayloadForActivateAccount } from 'types/jwt';
 import { ConfigService } from '@nestjs/config';
+import { EConfigKeys } from 'common/constants';
+import { ResetPasswordDto } from 'app/auth/dto/reset-password.dto';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -149,6 +151,7 @@ export class AuthService implements IAuthService {
   }
 
   async forgotPassword(email: string): Promise<void> {
+    // Verify if user exists
     const user = await this._userRepository.findOne({
       where: { email },
     });
@@ -160,42 +163,34 @@ export class AuthService implements IAuthService {
       );
     }
 
-    // Generate reset password token
-    const resetPasswordToken = this._generateJwtToken(user.id, user.email);
-
     // Send email with reset password link
     const payload: TJwtPayload = { sub: user.id, email: user.email };
 
     const resetToken = await this._jwtService.sign(payload, {
-      expiresIn: '1d',
+      expiresIn: this._configService.get<string>(EConfigKeys.JWT_RESET_PASSWORD_EXPIRES_IN),
     });
 
-    console.log(
-      'TODO: Send email with reset password link',
-      resetPasswordToken
-    );
+    const resetLink = this._configService.get<string>(EConfigKeys.CLIENT_RESET_PASSWORD_URL) + `token=${resetToken}`;
+
+    await this._mailerService.sendResetPasswordEmail(user.email, resetLink)
   }
 
-  async resetPassword(resetPasswordToken: string): Promise<string> {
-    const payload = await this._jwtService.decode(resetPasswordToken);
+  async resetPassword(data: ResetPasswordDto): Promise<void> {
+    const payload = await this._jwtService.decode(data.token);
 
     const user = await this._userRepository.findOne({
       where: { id: payload.sub },
     });
 
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new HttpException('Invalid token', HttpStatus.BAD_REQUEST);
     }
 
-    const randomPassword = Math.random().toString(36).slice(-8);
-
-    const hashedPassword = await this._hashPassword(randomPassword);
+    const hashedPassword = await this._hashPassword(data.password);
 
     user.password = hashedPassword;
 
     await this._userRepository.save(user);
-
-    return randomPassword;
   }
 
   async getUserById(id: string): Promise<GetUserDto | void> {

@@ -1,6 +1,7 @@
 import { GetUserDto } from "app/user/dto/get-user.dto";
 import { RegisterDto } from "../dto/register.dto";
 import { AuthenticatedUserDto } from "../dto/authenticated-user.dto";
+import { ResetPasswordDto } from "app/auth/dto/reset-password.dto";
 
 export interface IAuthService {
   /**
@@ -58,7 +59,8 @@ export interface IAuthService {
 
   /**
    * Description: Reset password
-   * @param resetPasswordToken: string
+   * @param token: string
+   * @param password: string
    * @implements
    * - Check if user exists
    * - Generate random password
@@ -68,7 +70,7 @@ export interface IAuthService {
    * Exceptions:
    * - 400: User with ID does not exist
    */
-  resetPassword(resetPasswordToken: string): Promise<string>;
+  resetPassword(data: ResetPasswordDto): Promise<void>;
   /**
    * Description: Validate user
    * @param email: string

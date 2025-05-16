@@ -19,6 +19,7 @@ import { GetUserDto } from 'app/user/dto/get-user.dto';
 import { Public } from 'app/auth/decorators/public.decorator';
 import { LoginDto } from 'app/auth/dto/login.dto';
 import { LocalAuthGuard } from 'app/auth/guards/local-auth.guard';
+import { ResetPasswordDto } from 'app/auth/dto/reset-password.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -143,5 +144,23 @@ export class AuthController {
       message: 'User activated successfully',
     };
   }
-  // #endregion
+
+  /**
+   * Name: Reset password
+   * Description: Reset user password
+   * @body ResetPasswordDto - The reset password data
+   * @returns void
+   */
+  @GenericApiResponse({ status: HttpStatus.OK, description: 'Password reset successful' })
+  @GenericApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid reset password data' })
+  @Public()
+  @Post('reset-password')
+  async resetPassword(@Body() data: ResetPasswordDto): Promise<HttpResponse<void>> {
+    await this._authService.resetPassword(data);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Password reset successful',
+    };
+  }
 }
