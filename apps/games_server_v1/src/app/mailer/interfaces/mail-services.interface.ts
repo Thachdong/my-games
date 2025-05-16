@@ -1,7 +1,7 @@
 import { ISendMailOptions } from "@nestjs-modules/mailer";
 
 export interface IMailService {
-  sendEmail(
+  sendMail(
     to: string,
     subject: string,
     template: string,

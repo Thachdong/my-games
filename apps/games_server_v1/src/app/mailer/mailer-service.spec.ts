@@ -1,19 +1,21 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MailerService } from './mailer.service';
-import { MailerService as _MailerService } from "@nestjs-modules/mailer";
-
+import { MailerService as _MailerService } from '@nestjs-modules/mailer';
 describe('MailerService', () => {
   let service: MailerService;
   let mailerService: _MailerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [MailerService, {
-        provide: _MailerService,
-        useValue: {
-          sendMail: jest.fn(),
-        }
-      }]
+      providers: [
+        MailerService,
+        {
+          provide: _MailerService,
+          useValue: {
+            sendMail: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     service = module.get<MailerService>(MailerService);
@@ -29,12 +31,22 @@ describe('MailerService', () => {
       const emailDetails = {
         to: 'test@example.com',
         subject: 'Test Subject',
-        text: 'Test Text',
+        template: 'Test Text',
       };
 
-      await service.sendEmail(emailDetails.to, emailDetails.subject, emailDetails.text);
+      jest.spyOn(mailerService, 'sendMail').mockResolvedValueOnce(undefined);
 
-      expect(mailerService.sendMail).toHaveBeenCalledWith(emailDetails);
+      await service.sendMail(
+        emailDetails.to,
+        emailDetails.subject,
+        emailDetails.template
+      );
+
+      expect(mailerService.sendMail).toHaveBeenCalledWith({
+        to: emailDetails.to,
+        subject: emailDetails.subject,
+        template: emailDetails.template,
+      });
     });
 
     it('should throw an error if mailerService.sendMail fails', async () => {
@@ -44,9 +56,17 @@ describe('MailerService', () => {
         text: 'Test Text',
       };
 
-      jest.spyOn(mailerService, 'sendMail').mockRejectedValue(new Error('SendMail Error'));
+      jest
+        .spyOn(mailerService, 'sendMail')
+        .mockRejectedValue(new Error('SendMail Error'));
 
-      await expect(service.sendEmail(emailDetails.to, emailDetails.subject, emailDetails.text)).rejects.toThrow('SendMail Error');
+      await expect(
+        service.sendMail(
+          emailDetails.to,
+          emailDetails.subject,
+          emailDetails.text
+        )
+      ).rejects.toThrow('SendMail Error');
     });
   });
 });

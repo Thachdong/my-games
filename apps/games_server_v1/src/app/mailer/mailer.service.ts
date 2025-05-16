@@ -9,7 +9,7 @@ import { IMailService } from './interfaces/mail-services.interface';
 export class MailerService implements IMailService {
   constructor(private readonly _mailerService: _MailerService) {}
 
-  async sendEmail(
+  async sendMail(
     to: string,
     subject: string,
     template: string,
