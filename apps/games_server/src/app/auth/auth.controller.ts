@@ -2,7 +2,6 @@ import { Body, Controller, Get, Post, Query, Request, UseGuards } from '@nestjs/
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 
 @ApiTags('auth')
@@ -23,7 +22,7 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   @UseGuards(AuthGuard('local'))
   @Post('login')
-  async login(@Request() req, @Body() loginDto: LoginDto) {
+  async login(@Request() req) {
     return this.authService.login(req.user);
   }
 
@@ -45,4 +44,4 @@ export class AuthController {
   getProfile(@Request() req) {
     return req.user;
   }
-} 
+}

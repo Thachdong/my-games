@@ -7,81 +7,27 @@ import { RegisterDto } from './dto/register.dto';
 import { JwtService } from '@nestjs/jwt';
 import { AuthenticatedUserDto } from './dto/authenticated-user.dto';
 import { GetUserDto } from '../user/dto/get-user.dto';
-import { TJwtPayload } from 'types/jwt';
-
-interface IAuthService {
-  /**
-   * Register a new user
-   */
-  register(data: RegisterDto): Promise<GetUserDto>;
-  /**
-   * Login
-   * @param data
-   * @returns AuthenticatedUserDto or void
-   */
-  login(user: GetUserDto): Promise<AuthenticatedUserDto | void>;
-  /**
-   * Get user by id
-   * @param id
-   * @returns User
-   */
-  logout(accessToken: string): Promise<void>;
-  /**
-   * Verify email
-   * @param userId
-   * @param token
-   * @implements
-   * - Check if user exists
-   * - Check if token is valid
-   * - Update user isEmailVerified to true
-   * @returns void
-   */
-  activate(userId: string, token: string): Promise<void>;
-  /**
-   * Forgot password
-   * @param email
-   * @implements
-   * - Check if user exists
-   * - Generate reset password token
-   * - Send email with reset password link
-   * @returns void
-   */
-  forgotPassword(email: string): Promise<void>;
-  /**
-   * Reset password
-   * @param userId
-   * @implements
-   * - Check if user exists
-   * - Generate random password
-   * - Hash password
-   * - Update user password
-   * @returns random password
-   */
-  resetPassword(resetPasswordToken: string): Promise<string>;
-  /**
-   * Validate user
-   * @param email
-   * @param password
-   * @returns User or null
-   */
-  validateUser(email: string, password: string): Promise<User | null>;
-  /**
-   * Get user by id
-   * @param id
-   * @returns User
-   */
-  getUserById(id: string): Promise<GetUserDto | void>;
-}
+import { IAuthService } from './interfaces/auth-service.interface';
+import { MailerService } from 'app/mailer/mailer.service';
+import { TJwtPayload, TJwtPayloadForActivateAccount } from 'types/jwt';
+import { ConfigService } from '@nestjs/config';
+import { EConfigKeys } from 'common/constants';
+import { ResetPasswordDto } from 'app/auth/dto/reset-password.dto';
 
 @Injectable()
 export class AuthService implements IAuthService {
   constructor(
     @InjectRepository(User) private readonly _userRepository: Repository<User>,
-    private readonly _jwtService: JwtService
+    private readonly _jwtService: JwtService,
+    private readonly _mailerService: MailerService,
+    private readonly _configService: ConfigService,
   ) {}
 
   /**
-   * Generate verification token
+   * Description: Generate verification token
+   * @param: void
+   * @returns: string
+   * @example: 'abc123xyz456'
    */
   private _generateVerificationToken(): string {
     return (
@@ -91,8 +37,8 @@ export class AuthService implements IAuthService {
   }
 
   /**
-   * Hashing password
-   * @param password
+   * Description: Hashing password
+   * @param password: string
    * @returns Promise<string>
    */
   private async _hashPassword(password: string): Promise<string> {
@@ -102,7 +48,7 @@ export class AuthService implements IAuthService {
   }
 
   /**
-   * Generate jwt token
+   * Description: Generate jwt token
    * @param userId
    * @param email
    * @returns Promise<string>
@@ -117,22 +63,42 @@ export class AuthService implements IAuthService {
   }
 
   async register(data: RegisterDto): Promise<GetUserDto> {
+    // Check if user already exists
+    const existingUser = await this._userRepository.findOne({ where: { email: data.email }})
+
+    if (existingUser) {
+      throw new HttpException(`User with email (${data.email}) already exists`, HttpStatus.BAD_REQUEST);
+    }
+
     // Hash password
     const hashedPassword = await this._hashPassword(data.password);
 
     // Create user
+    const verificationToken = this._generateVerificationToken();
+
     const user = this._userRepository.create({
       ...data,
       password: hashedPassword,
-      verificationToken: this._generateVerificationToken(),
+      verificationToken,
     });
 
     await this._userRepository.save(user);
 
+    // Send verification email
+    const payload: TJwtPayloadForActivateAccount = { sub: user.id, verificationToken }
+    
+    const activateToken = await this._jwtService.sign(payload, {
+      expiresIn: this._configService.get<string>('JWT_ACTIVATION_EXPIRES_IN'), // Token expiration time set to one year
+    })
+
+    const verificationLink = `http://localhost:3000/auth/activate/${activateToken}`;
+
+    await this._mailerService.sendActivateEmail(user.email, verificationLink);
+
     return user;
   }
 
-  async validateUser(email: string, password: string): Promise<User | null> {
+  async validateUser(email: string, password: string): Promise<GetUserDto | null> {
     const user = await this._userRepository.findOne({
       where: { email },
     });
@@ -160,20 +126,11 @@ export class AuthService implements IAuthService {
   }
 
   async logout(accessToken: string): Promise<void> {
-    // Invalidate the token (implementation depends on your token management strategy)
-    // For example, you could maintain a blacklist of invalidated tokens in a database or cache.
-    // Here, we'll assume a token blacklist service or similar mechanism is in place.
-    // Example:
-    // await this._tokenBlacklistService.addToBlacklist(accessToken);
-
-    // If no token blacklist is used, JWTs are stateless and cannot be invalidated server-side.
-    // In that case, you can only rely on token expiration.
-
     console.log(`Token invalidated: ${accessToken}`);
   }
 
   async activate(token: string): Promise<void> {
-    const payload = await this._jwtService.decode(token);
+    const payload: TJwtPayloadForActivateAccount = await this._jwtService.decode(token);
 
     const user = await this._userRepository.findOne({
       where: { id: payload.sub },
@@ -183,7 +140,7 @@ export class AuthService implements IAuthService {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    if (user.verificationToken !== token) {
+    if (user.verificationToken !== payload.verificationToken) {
       throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
     }
 
@@ -194,6 +151,7 @@ export class AuthService implements IAuthService {
   }
 
   async forgotPassword(email: string): Promise<void> {
+    // Verify if user exists
     const user = await this._userRepository.findOne({
       where: { email },
     });
@@ -205,36 +163,34 @@ export class AuthService implements IAuthService {
       );
     }
 
-    // Generate reset password token
-    const resetPasswordToken = this._generateJwtToken(user.id, user.email);
-
     // Send email with reset password link
-    console.log(
-      'TODO: Send email with reset password link',
-      resetPasswordToken
-    );
+    const payload: TJwtPayload = { sub: user.id, email: user.email };
+
+    const resetToken = await this._jwtService.sign(payload, {
+      expiresIn: this._configService.get<string>(EConfigKeys.JWT_RESET_PASSWORD_EXPIRES_IN),
+    });
+
+    const resetLink = this._configService.get<string>(EConfigKeys.CLIENT_RESET_PASSWORD_URL) + `token=${resetToken}`;
+
+    await this._mailerService.sendResetPasswordEmail(user.email, resetLink)
   }
 
-  async resetPassword(resetPasswordToken: string): Promise<string> {
-    const payload = await this._jwtService.decode(resetPasswordToken);
+  async resetPassword(data: ResetPasswordDto): Promise<void> {
+    const payload = await this._jwtService.decode(data.token);
 
     const user = await this._userRepository.findOne({
       where: { id: payload.sub },
     });
 
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new HttpException('Invalid token', HttpStatus.BAD_REQUEST);
     }
 
-    const randomPassword = Math.random().toString(36).slice(-8);
-
-    const hashedPassword = await this._hashPassword(randomPassword);
+    const hashedPassword = await this._hashPassword(data.password);
 
     user.password = hashedPassword;
 
     await this._userRepository.save(user);
-
-    return randomPassword;
   }
 
   async getUserById(id: string): Promise<GetUserDto | void> {

@@ -50,3 +50,7 @@ vitest.config.*.timestamp*
 .env.production
 .env.test
 .env.test.local
+.env.game-v1
+
+.cursor\rules\nx-rules.mdc
+.github\instructions\nx.instructions.md

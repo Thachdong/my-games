@@ -1,26 +1,31 @@
 import {
   Body,
   Controller,
-  HttpException,
+  Get,
   HttpStatus,
   Param,
   Post,
   Req,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RegisterDto } from './dto/register.dto';
 import { HttpResponse } from '../../common/http-response';
 import { AuthService } from './auth.service';
 import { GenericApiResponse } from 'decorators/generic-api-response.decorator';
 import { AuthenticatedUserDto } from 'app/auth/dto/authenticated-user.dto';
 import { GetUserDto } from 'app/user/dto/get-user.dto';
+import { Public } from 'app/auth/decorators/public.decorator';
+import { LoginDto } from 'app/auth/dto/login.dto';
+import { LocalAuthGuard } from 'app/auth/guards/local-auth.guard';
+import { ResetPasswordDto } from 'app/auth/dto/reset-password.dto';
+import { IAuthConroller } from 'app/auth/interfaces/auth-controller.interface';
 
 @ApiTags('auth')
 @Controller('auth')
-export class AuthController {
+export class AuthController implements IAuthConroller {
   constructor(private readonly _authService: AuthService) {}
 
-  // #region -- Register --
   @ApiOperation({ summary: 'Register a user' })
   @GenericApiResponse(
     { description: 'User registration successful', status: HttpStatus.CREATED },
@@ -30,6 +35,7 @@ export class AuthController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid user data',
   })
+  @Public()
   @Post('register')
   async register(@Body() data: RegisterDto): Promise<HttpResponse<GetUserDto>> {
     const user = await this._authService.register(data);
@@ -40,10 +46,9 @@ export class AuthController {
       data: user,
     };
   }
-  // #endregion
 
-  // #region -- Login --
   @ApiOperation({ summary: 'User login to the game' })
+  @ApiBody({ type: LoginDto })
   @GenericApiResponse(
     { status: HttpStatus.OK, description: 'Login successful' },
     AuthenticatedUserDto
@@ -52,8 +57,12 @@ export class AuthController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized access',
   })
+  @Public()
+  @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Req() req): Promise<HttpResponse<AuthenticatedUserDto | void>> {
+  async login(
+    @Req() req: Request & { user: GetUserDto }
+  ): Promise<HttpResponse<AuthenticatedUserDto | void>> {
     const user = req.user;
 
     const authenticatedUser = await this._authService.login(user);
@@ -64,9 +73,7 @@ export class AuthController {
       data: authenticatedUser,
     };
   }
-  // #endregion
 
-  // #region -- Logout --
   @ApiOperation({ summary: 'User logout from the game' })
   @GenericApiResponse({
     status: HttpStatus.OK,
@@ -78,11 +85,12 @@ export class AuthController {
   })
   @Post('logout')
   async logout() {
-    throw new HttpException('Bad request', HttpStatus.BAD_REQUEST);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Logout successful',
+    }
   }
-  // #endregion
 
-  // #region -- Activate Account --
   @ApiOperation({ summary: 'Activate a new account' })
   @GenericApiResponse({
     status: HttpStatus.OK,
@@ -92,7 +100,8 @@ export class AuthController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Token has expired',
   })
-  @Post('activate/:token')
+  @Public()
+  @Get('activate/:token')
   async activate(@Param('token') token: string): Promise<HttpResponse<void>> {
     await this._authService.activate(token);
 
@@ -101,5 +110,25 @@ export class AuthController {
       message: 'User activated successfully',
     };
   }
-  // #endregion
+
+  @GenericApiResponse({
+    status: HttpStatus.OK,
+    description: 'Password reset successful',
+  })
+  @GenericApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid reset password data',
+  })
+  @Public()
+  @Post('reset-password')
+  async resetPassword(
+    @Body() data: ResetPasswordDto
+  ): Promise<HttpResponse<void>> {
+    await this._authService.resetPassword(data);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Password reset successful',
+    };
+  }
 }

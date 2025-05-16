@@ -8,21 +8,24 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LocalStrategy } from './passport-strategies/local.strategy';
 import { JwtStrategy } from './passport-strategies/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
+import { MailerModule } from 'app/mailer/mailer.module';
+import { EConfigKeys } from 'common/constants';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
+    PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
+        secret: configService.get<string>(EConfigKeys.JWT_SECRET),
         signOptions: {
-          expiresIn: `${configService.get<string>('JWT_EXPIRATION')}s`,
+          expiresIn: configService.get<string>(EConfigKeys.JWT_EXPIRES_IN),
         },
       }),
     }),
-    PassportModule,
+    MailerModule,
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy],
   controllers: [AuthController],
