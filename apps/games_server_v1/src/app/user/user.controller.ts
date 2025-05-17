@@ -8,22 +8,37 @@ import {
   ParseUUIDPipe,
   Body,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { GetUserDto } from './dto/get-user.dto';
 import { GenericApiResponse } from '../../decorators/generic-api-response.decorator';
 import { HttpResponse } from '../../common/http-response';
+import { AuthControllerInterface } from 'app/user/interfaces';
 
 @ApiTags('user')
 @ApiBearerAuth('access-token')
 @Controller('user')
-export class UserController {
+export class UserController implements AuthControllerInterface {
   constructor(private readonly _userService: UserService) {}
 
   @ApiOperation({ summary: 'Get users with paginate' })
-  @ApiParam({ name: 'page', description: 'Page number for pagination', required: false })
-  @ApiParam({ name: 'limit', description: 'Limit number of users per page', required: false })
+  @ApiQuery({
+    name: 'page',
+    description: 'Page number for pagination',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'limit',
+    description: 'Limit number of users per page',
+    required: false,
+  })
   @GenericApiResponse(
     { status: 200, description: 'Return user with paginate' },
     [GetUserDto]
@@ -47,10 +62,6 @@ export class UserController {
     };
   }
 
-  /**
-   * Get user by id
-   * Authorize by: [admin, owner]
-   */
   @ApiOperation({ summary: 'Get user by Id' })
   @GenericApiResponse(
     { status: 200, description: 'Return the user' },
@@ -79,10 +90,6 @@ export class UserController {
     };
   }
 
-  /**
-   * Update user profile
-   * Authorize by: [admin, owner]
-   */
   @ApiOperation({ summary: 'Update user profile' })
   @GenericApiResponse({
     status: HttpStatus.OK,
@@ -96,10 +103,11 @@ export class UserController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid data',
   })
-  @Patch('profile')
+  @ApiParam({ name: 'id', description: 'User id' })
+  @Patch(':id')
   async update(
-    @Body() data: UpdateUserDto,
-    @Param('id', ParseUUIDPipe) id: string
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() data: UpdateUserDto
   ): Promise<HttpResponse<null>> {
     await this._userService.updateUser(id, data);
 

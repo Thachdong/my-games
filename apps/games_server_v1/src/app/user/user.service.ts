@@ -5,16 +5,15 @@ import { User } from './entities/user.entity';
 import { PAGE_SIZE } from '../constants';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { IPaginate } from '../../types/paginate';
+import { IUserService } from 'app/user/interfaces';
+import { GetUserDto } from 'app/user/dto';
 
 @Injectable()
-export class UserService {
+export class UserService implements IUserService {
   constructor(
     @InjectRepository(User) private readonly _userRepository: Repository<User>
   ) {}
 
-  /**
-   * Update user
-   */
   async updateUser(id: string, data: UpdateUserDto): Promise<User> {
     const user = await this._userRepository.findOne({ where: { id } });
 
@@ -24,12 +23,13 @@ export class UserService {
 
     await this._userRepository.update(id, data);
 
-    return this._userRepository.findOne({ where: { id } });
+    const updatedUser = await this._userRepository.findOne({ where: { id } });
+
+    delete updatedUser['password'];
+
+    return updatedUser;
   }
 
-  /**
-   * Get user by id
-   */
   async getUserById(id: string): Promise<User | void> {
     const user = await this._userRepository.findOne({ where: { id } });
 
@@ -40,13 +40,12 @@ export class UserService {
       );
     }
 
+    delete user['password']
+
     return user;
   }
 
-  /**
-   * Get all user
-   */
-  async getAll(page?: number, limit?: number): Promise<IPaginate<User>> {
+  async getAll(page?: number, limit?: number): Promise<IPaginate<GetUserDto>> {
     const take = limit || PAGE_SIZE;
     const skip = ((page || 1) - 1) * (limit || PAGE_SIZE);
     const [users, total] = await this._userRepository.findAndCount({
@@ -55,10 +54,10 @@ export class UserService {
     });
 
     return {
-      page,
-      limit,
+      page: page || 1,
+      limit: limit || PAGE_SIZE,
       total,
-      data: users
+      data: users.map(({ password, ...u}) => ({ ...u}))
     };
   }
 }
