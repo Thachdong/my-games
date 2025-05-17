@@ -20,7 +20,7 @@ export class AuthService implements IAuthService {
     @InjectRepository(User) private readonly _userRepository: Repository<User>,
     private readonly _jwtService: JwtService,
     private readonly _mailerService: MailerService,
-    private readonly _configService: ConfigService,
+    private readonly _configService: ConfigService
   ) {}
 
   /**
@@ -64,10 +64,15 @@ export class AuthService implements IAuthService {
 
   async register(data: RegisterDto): Promise<GetUserDto> {
     // Check if user already exists
-    const existingUser = await this._userRepository.findOne({ where: { email: data.email }})
+    const existingUser = await this._userRepository.findOne({
+      where: { email: data.email },
+    });
 
     if (existingUser) {
-      throw new HttpException(`User with email (${data.email}) already exists`, HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        `User with email (${data.email}) already exists`,
+        HttpStatus.BAD_REQUEST
+      );
     }
 
     // Hash password
@@ -85,20 +90,28 @@ export class AuthService implements IAuthService {
     await this._userRepository.save(user);
 
     // Send verification email
-    const payload: TJwtPayloadForActivateAccount = { sub: user.id, verificationToken }
-    
+    const payload: TJwtPayloadForActivateAccount = {
+      sub: user.id,
+      verificationToken,
+    };
+
     const activateToken = await this._jwtService.sign(payload, {
       expiresIn: this._configService.get<string>('JWT_ACTIVATION_EXPIRES_IN'), // Token expiration time set to one year
-    })
+    });
 
     const verificationLink = `http://localhost:3000/auth/activate/${activateToken}`;
 
     await this._mailerService.sendActivateEmail(user.email, verificationLink);
 
+    delete user.password;
+
     return user;
   }
 
-  async validateUser(email: string, password: string): Promise<GetUserDto | null> {
+  async validateUser(
+    email: string,
+    password: string
+  ): Promise<GetUserDto | null> {
     const user = await this._userRepository.findOne({
       where: { email },
     });
@@ -112,6 +125,8 @@ export class AuthService implements IAuthService {
     if (!isPasswordValid) {
       return null;
     }
+
+    delete user['password']
 
     return user;
   }
@@ -130,7 +145,8 @@ export class AuthService implements IAuthService {
   }
 
   async activate(token: string): Promise<void> {
-    const payload: TJwtPayloadForActivateAccount = await this._jwtService.decode(token);
+    const payload: TJwtPayloadForActivateAccount =
+      await this._jwtService.decode(token);
 
     const user = await this._userRepository.findOne({
       where: { id: payload.sub },
@@ -167,12 +183,16 @@ export class AuthService implements IAuthService {
     const payload: TJwtPayload = { sub: user.id, email: user.email };
 
     const resetToken = await this._jwtService.sign(payload, {
-      expiresIn: this._configService.get<string>(EConfigKeys.JWT_RESET_PASSWORD_EXPIRES_IN),
+      expiresIn: this._configService.get<string>(
+        EConfigKeys.JWT_RESET_PASSWORD_EXPIRES_IN
+      ),
     });
 
-    const resetLink = this._configService.get<string>(EConfigKeys.CLIENT_RESET_PASSWORD_URL) + `token=${resetToken}`;
+    const resetLink =
+      this._configService.get<string>(EConfigKeys.CLIENT_RESET_PASSWORD_URL) +
+      `token=${resetToken}`;
 
-    await this._mailerService.sendResetPasswordEmail(user.email, resetLink)
+    await this._mailerService.sendResetPasswordEmail(user.email, resetLink);
   }
 
   async resetPassword(data: ResetPasswordDto): Promise<void> {
