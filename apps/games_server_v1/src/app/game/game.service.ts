@@ -49,8 +49,8 @@ export class GameService implements IGameService {
   }
 
   async addMove(data: CreateMoveDto): Promise<void> {
-    const game = this._moveRepository.create(data);
+    const move = this._moveRepository.create(data);
 
-    await this._gameRepository.save(game);
+    await this._moveRepository.save(move);
   }
 }
