@@ -8,7 +8,13 @@ import {
   ParseUUIDPipe,
   Body,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { GetUserDto } from './dto/get-user.dto';
@@ -23,8 +29,16 @@ export class UserController implements AuthControllerInterface {
   constructor(private readonly _userService: UserService) {}
 
   @ApiOperation({ summary: 'Get users with paginate' })
-  @ApiParam({ name: 'page', description: 'Page number for pagination', required: false })
-  @ApiParam({ name: 'limit', description: 'Limit number of users per page', required: false })
+  @ApiQuery({
+    name: 'page',
+    description: 'Page number for pagination',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'limit',
+    description: 'Limit number of users per page',
+    required: false,
+  })
   @GenericApiResponse(
     { status: 200, description: 'Return user with paginate' },
     [GetUserDto]
@@ -76,7 +90,6 @@ export class UserController implements AuthControllerInterface {
     };
   }
 
-
   @ApiOperation({ summary: 'Update user profile' })
   @GenericApiResponse({
     status: HttpStatus.OK,
@@ -90,10 +103,11 @@ export class UserController implements AuthControllerInterface {
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid data',
   })
-  @Patch('profile')
+  @ApiParam({ name: 'id', description: 'User id' })
+  @Patch(':id')
   async update(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() data: UpdateUserDto,
+    @Body() data: UpdateUserDto
   ): Promise<HttpResponse<null>> {
     await this._userService.updateUser(id, data);
 
