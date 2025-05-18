@@ -1,28 +1,39 @@
 import {
   Body,
   Controller,
+  Get,
   HttpStatus,
   Param,
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { TournamentService } from './tournament.service';
 import { CreateTournamentDto } from './dto/create-tournament.dto';
 import {
   UpdateTournamentTitleDto,
   TournamentPlayerDto,
-} from './dto/update-tournament.dto';
-import { UpdateTournamentRankDto } from './dto/update-tournament-rank.dto';
+  GetTournamentDto,
+} from 'app/tournament/dto';
+import { ITournamentController } from 'app/tournament/interfaces';
+import { HttpResponse } from 'common/http-response';
 
 @ApiTags('tournament')
+@ApiBearerAuth('access-token')
 @Controller('tournament')
-export class TournamentController {
+export class TournamentController implements ITournamentController {
   constructor(private readonly _tournamentService: TournamentService) {}
 
   /**
-   * Create tournament
+   * ============================ create =================================
    */
   @ApiOperation({ summary: 'Create tournament' })
   @ApiResponse({
@@ -42,12 +53,94 @@ export class TournamentController {
     description: 'Unauthorized access',
   })
   @Post()
-  create(@Body() data: CreateTournamentDto) {
-    this._tournamentService.create(data);
+  async create(
+    @Body() data: CreateTournamentDto
+  ): Promise<HttpResponse<GetTournamentDto>> {
+    const tournament = await this._tournamentService.create(data);
+
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Tournamnet created successfully',
+      data: tournament,
+    };
   }
 
   /**
-   * Update tournament
+   * ============================ Get by id =================================
+   */
+  @ApiOperation({ summary: 'Get tournament by id' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Tournament retrieved successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Tournament not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized access',
+  })
+  @Get(':id')
+  async getById(
+    @Param('id', ParseUUIDPipe) id: string
+  ): Promise<HttpResponse<GetTournamentDto | null>> {
+    const tournament = await this._tournamentService.getById(id);
+
+    if (!tournament) {
+      return {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: `Tournament with id ${id} not found`,
+        data: null,
+      };
+    }
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Tournament retrieved successfully',
+      data: tournament,
+    };
+  }
+
+  /**
+   * ============================ GetAll =================================
+   */
+  @ApiOperation({ summary: 'Get all tournaments' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Tournament retrieved successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized access',
+  })
+  @ApiQuery({
+    name: 'page',
+    description: 'Page number for pagination',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'limit',
+    description: 'Limit number of users per page',
+    required: false,
+  })
+  @Get()
+  async getAll(
+    @Query('page') page?: number,
+    @Query('limit') limit?: number
+  ): Promise<HttpResponse<GetTournamentDto[]>> {
+    const { data, ...meta } = await this._tournamentService.getAll(page, limit);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Tournament retrieved successfully',
+      data,
+      meta,
+    };
+  }
+
+  /**
+   * ============================ updateTournamentTitle =================================
    */
   @ApiOperation({ summary: 'Update tournament (title)' })
   @ApiResponse({
@@ -67,15 +160,20 @@ export class TournamentController {
     description: 'Access forbidden',
   })
   @Patch(':id/title')
-  updateTournament(
+  async updateTournamentTitle(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() data: UpdateTournamentTitleDto
-  ) {
-    this._tournamentService.updateTitle(id, data.title);
+  ): Promise<HttpResponse<void>> {
+    await this._tournamentService.updateTitle(id, data.title);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Tournament title updated successfully',
+    };
   }
 
   /**
-   * Update tournament
+   * ============================ playerJoin =================================
    */
   @ApiOperation({ summary: 'Player join tournament' })
   @ApiResponse({
@@ -95,15 +193,20 @@ export class TournamentController {
     description: 'Access forbidden',
   })
   @Patch(':id/join')
-  playerJoin(
+  async playerJoin(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() data: TournamentPlayerDto
-  ) {
-    this._tournamentService.playerJoin(id, data.userId);
+  ): Promise<HttpResponse<void>> {
+    await this._tournamentService.playerJoin(id, data.userId);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Player join tournament successfully',
+    };
   }
 
   /**
-   * Update tournament
+   * ============================ playerLeave =================================
    */
   @ApiOperation({ summary: 'Update tournament (title)' })
   @ApiResponse({
@@ -123,38 +226,15 @@ export class TournamentController {
     description: 'Access forbidden',
   })
   @Patch(':id/leave')
-  playerLeave(
+  async playerLeave(
     @Param('id', ParseUUIDPipe) id: string,
     data: TournamentPlayerDto
   ) {
-    this._tournamentService.playerLeave(id, data.userId);
-  }
+    await this._tournamentService.playerLeave(id, data.userId);
 
-  /**
-   * Update rank
-   */
-  @ApiOperation({ summary: 'Update tournament ranking' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Ranking updated successfully',
-  })
-  @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    description: 'Invalid data provided',
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description: 'Unauthorized access',
-  })
-  @ApiResponse({
-    status: HttpStatus.FORBIDDEN,
-    description: 'Access forbidden',
-  })
-  @Patch(':rankId/rank')
-  updateRank(
-    @Param('rankId', ParseUUIDPipe) id: string,
-    @Body() data: UpdateTournamentRankDto
-  ) {
-    this._tournamentService.updateRank(id, data);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Player leave tournament successfully',
+    };
   }
 }

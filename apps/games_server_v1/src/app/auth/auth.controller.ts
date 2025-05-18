@@ -26,6 +26,9 @@ import { IAuthConroller } from 'app/auth/interfaces/auth-controller.interface';
 export class AuthController implements IAuthConroller {
   constructor(private readonly _authService: AuthService) {}
 
+  /**
+   * ============================ register =================================
+   */
   @ApiOperation({ summary: 'Register a user' })
   @GenericApiResponse(
     { description: 'User registration successful', status: HttpStatus.CREATED },
@@ -47,6 +50,9 @@ export class AuthController implements IAuthConroller {
     };
   }
 
+  /**
+   * ============================ login =================================
+   */
   @ApiOperation({ summary: 'User login to the game' })
   @ApiBody({ type: LoginDto })
   @GenericApiResponse(
@@ -74,6 +80,9 @@ export class AuthController implements IAuthConroller {
     };
   }
 
+  /**
+   * ============================ logout =================================
+   */
   @ApiOperation({ summary: 'User logout from the game' })
   @GenericApiResponse({
     status: HttpStatus.OK,
@@ -88,9 +97,12 @@ export class AuthController implements IAuthConroller {
     return {
       statusCode: HttpStatus.OK,
       message: 'Logout successful',
-    }
+    };
   }
 
+  /**
+   * ============================ activate =================================
+   */
   @ApiOperation({ summary: 'Activate a new account' })
   @GenericApiResponse({
     status: HttpStatus.OK,
@@ -111,6 +123,9 @@ export class AuthController implements IAuthConroller {
     };
   }
 
+  /**
+   * ============================ resetPassword =================================
+   */
   @GenericApiResponse({
     status: HttpStatus.OK,
     description: 'Password reset successful',

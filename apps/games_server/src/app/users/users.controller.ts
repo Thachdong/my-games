@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -21,7 +21,7 @@ export class UsersController {
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiParam({ name: 'id', description: 'User ID' })
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.usersService.findOne(id);
   }
 

@@ -28,6 +28,9 @@ import { AuthControllerInterface } from 'app/user/interfaces';
 export class UserController implements AuthControllerInterface {
   constructor(private readonly _userService: UserService) {}
 
+  /**
+   * ============================ findAll =================================
+   */
   @ApiOperation({ summary: 'Get users with paginate' })
   @ApiQuery({
     name: 'page',
@@ -62,6 +65,9 @@ export class UserController implements AuthControllerInterface {
     };
   }
 
+  /**
+   * ============================ findById =================================
+   */
   @ApiOperation({ summary: 'Get user by Id' })
   @GenericApiResponse(
     { status: 200, description: 'Return the user' },
@@ -90,6 +96,9 @@ export class UserController implements AuthControllerInterface {
     };
   }
 
+  /**
+   * ============================ update =================================
+   */
   @ApiOperation({ summary: 'Update user profile' })
   @GenericApiResponse({
     status: HttpStatus.OK,
