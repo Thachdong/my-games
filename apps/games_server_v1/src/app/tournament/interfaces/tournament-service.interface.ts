@@ -1,8 +1,5 @@
 import { IPaginate } from 'types/paginate';
-import {
-  CreateTournamentDto,
-  GetTournamentDto,
-} from 'app/tournament/dto';
+import { CreateTournamentDto, GetTournamentDto } from 'app/tournament/dto';
 
 export interface ITournamentService {
   /**
@@ -19,6 +16,15 @@ export interface ITournamentService {
    * @returns Promise<IPaginate<GetTournamentDto>>
    */
   getAll(page?: number, limit?: number): Promise<IPaginate<GetTournamentDto>>;
+
+  /**
+   * Description: Get tournament by id
+   * @param id - UUID
+   * @returns Promise<IPaginate<GetTournamentDto>>
+   * Exceptions:
+   * - HttpStatus.NOT_FOUND
+   */
+  getById(id: string): Promise<GetTournamentDto | null>;
 
   /**
    * Description: Update title of a tournament
@@ -39,7 +45,7 @@ export interface ITournamentService {
    * - HttpStatus.BAD_REQUEST - tournament not found
    * - HttpStatus.BAD_REQUEST - user already joined
    */
-  playerJoin(tournamentId: string, userId: string): Promise<void>
+  playerJoin(tournamentId: string, userId: string): Promise<void>;
 
   /**
    * Description: Player leave the tournament
@@ -47,5 +53,5 @@ export interface ITournamentService {
    * @param userId - UUID
    * @returns Promise<void>
    */
-  playerLeave(tournamentId: string, userId: string): Promise<void>
+  playerLeave(tournamentId: string, userId: string): Promise<void>;
 }

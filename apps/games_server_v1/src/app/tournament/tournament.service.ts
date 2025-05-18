@@ -46,6 +46,14 @@ export class TournamentService implements ITournamentService {
     };
   }
 
+  async getById(id: string): Promise<GetTournamentDto | null> {
+    const tournament = await this._tournamentRepository.findOne({
+      where: { id },
+    });
+
+    return tournament;
+  }
+
   async updateTitle(id: string, title: string): Promise<GetTournamentDto> {
     const tournament = await this._tournamentRepository.findOne({
       where: { id },

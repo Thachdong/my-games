@@ -26,6 +26,13 @@ export interface ITournamentController {
   ): Promise<HttpResponse<GetTournamentDto[]>>;
 
   /**
+   * Description: Get tournament by id
+   * @param id - UUID
+   * @returns Promise<HttpResponse<GetTournamentDto[]>>
+   */
+  getById(id: string): Promise<HttpResponse<GetTournamentDto | null>>;
+
+  /**
    * Description: Update tournament by id
    * @param id - UUID
    * @param data - UpdateTournamentTitleDto
@@ -54,5 +61,5 @@ export interface ITournamentController {
   playerLeave(
     id: string,
     data: TournamentPlayerDto
-  ): Promise<HttpResponse<void>>
+  ): Promise<HttpResponse<void>>;
 }

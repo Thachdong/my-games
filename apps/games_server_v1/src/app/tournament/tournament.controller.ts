@@ -66,12 +66,53 @@ export class TournamentController implements ITournamentController {
   }
 
   /**
+   * ============================ Get by id =================================
+   */
+  @ApiOperation({ summary: 'Get tournament by id' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Tournament retrieved successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Tournament not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized access',
+  })
+  @Get(':id')
+  async getById(
+    @Param('id', ParseUUIDPipe) id: string
+  ): Promise<HttpResponse<GetTournamentDto | null>> {
+    const tournament = await this._tournamentService.getById(id);
+
+    if (!tournament) {
+      return {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: `Tournament with id ${id} not found`,
+        data: null,
+      };
+    }
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Tournament retrieved successfully',
+      data: tournament,
+    };
+  }
+
+  /**
    * ============================ GetAll =================================
    */
   @ApiOperation({ summary: 'Get all tournaments' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Tournament retrieved successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized access',
   })
   @ApiQuery({
     name: 'page',
