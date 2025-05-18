@@ -1,13 +1,22 @@
 import {
   Body,
   Controller,
+  Get,
   HttpStatus,
   Param,
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CreateGameDto } from './dto/create-game.dto';
 import { GameService } from './game.service';
 import { UpdateGameDto } from './dto/update-game.dto';
@@ -15,6 +24,7 @@ import { CreateMoveDto } from './dto/create-move.dto';
 import { IGameController } from 'app/game/interfaces';
 import { HttpResponse } from 'common/http-response';
 import { GenericApiResponse } from 'decorators/generic-api-response.decorator';
+import { GameDto } from 'app/game/dto';
 
 @ApiTags('game')
 @ApiBearerAuth('access-token')
@@ -45,6 +55,81 @@ export class GameController implements IGameController {
     return {
       statusCode: HttpStatus.CREATED,
       message: 'Create game successfully',
+    };
+  }
+
+  /**
+   * ============================ getAll =================================
+   */
+  @ApiOperation({ summary: 'Get all game' })
+  @GenericApiResponse(
+    {
+      status: HttpStatus.OK,
+      description: 'Games retrieved successfully',
+    },
+    [GameDto]
+  )
+  @GenericApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized access',
+  })
+  @ApiQuery({
+    name: 'page',
+    description: 'Page number for pagination',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'limit',
+    description: 'Limit number for pagination',
+    required: false,
+  })
+  @Get()
+  async getAll(
+    @Query('page') page?: number,
+    @Query('limit') limit?: number
+  ): Promise<HttpResponse<GameDto[]>> {
+    const { data, ...meta } = await this._gameService.getAllGame(page, limit);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Get all games successfully',
+      data,
+      meta,
+    };
+  }
+
+  /**
+   * ============================ getGameById =================================
+   */
+  @ApiOperation({ summary: 'Get game by id' })
+  @GenericApiResponse(
+    { status: HttpStatus.OK, description: 'Get game by id successfully' },
+    GameDto
+  )
+  @GenericApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Can not find game',
+  })
+  @GenericApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized access',
+  })
+  @ApiParam({ name: 'id', description: 'Game id', required: true })
+  @Get(':id')
+  async getGameById(@Param('id') id: string): Promise<HttpResponse<GameDto>> {
+    const game = await this._gameService.getGameById(id);
+
+    if (!game) {
+      return {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: `Game with id (${id}) not found`,
+      };
+    }
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Get Game by id successfully',
+      data: game,
     };
   }
 

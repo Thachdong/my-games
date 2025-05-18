@@ -1,4 +1,10 @@
-import { CreateGameDto, CreateMoveDto, UpdateGameDto } from 'app/game/dto';
+import { IPaginate } from 'types';
+import {
+  CreateGameDto,
+  CreateMoveDto,
+  GameDto,
+  UpdateGameDto,
+} from 'app/game/dto';
 import { HttpResponse } from 'common/http-response';
 
 export interface IGameController {
@@ -12,6 +18,32 @@ export interface IGameController {
    * - HttpStatus.UNAUTHORIZED
    */
   create(data: CreateGameDto): Promise<HttpResponse<void>>;
+
+  /**
+   * Description: Get all games controller
+   * @param page - number - optinal
+   * @param limit - number - optional
+   * @returns Promise<HttpResponse<IPaginate<GameDto>>>
+   * HttpStatus:
+   * - HttpStatus.OK
+   * - HttpStatus.UNAUTHORIZED
+   */
+  getAll(
+    page?: number,
+    limit?: number
+  ): Promise<HttpResponse<GameDto[]>>;
+
+  /**
+   * Description: Update game controller
+   * @param id - UUID
+   * @param data - UpdateGameDto
+   * @returns Promise<HttpResponse<void>>
+   * HttpStatus:
+   * - HttpStatus.OK
+   * - HttpStatus.NOT_FOUND
+   * - HttpStatus.UNAUTHORIZED
+   */
+  getGameById(id: string): Promise<HttpResponse<GameDto>>;
 
   /**
    * Description: Update game controller
