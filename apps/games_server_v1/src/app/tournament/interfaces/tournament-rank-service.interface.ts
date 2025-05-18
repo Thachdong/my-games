@@ -38,5 +38,5 @@ export interface ITournamentRankService {
   updateRank(
     id: string,
     data: UpdateTournamentRankDto
-  ): Promise<GetTournamentRankDto | void>;
+  ): Promise<GetTournamentRankDto>;
 }

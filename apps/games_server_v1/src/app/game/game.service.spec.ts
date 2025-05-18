@@ -35,7 +35,6 @@ describe('GameService', () => {
       expect(gameService).toBeDefined();
     });
   });
-
   describe('Test method createGame', () => {
     it('Should create game successfull', async () => {
       const gameData = new CreateGameDto();

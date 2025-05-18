@@ -51,7 +51,7 @@ export class TournamentRankService implements ITournamentRankService {
   async updateRank(
     id: string,
     data: UpdateTournamentRankDto
-  ): Promise<GetTournamentRankDto | void> {
+  ): Promise<GetTournamentRankDto> {
     const rank = await this._repository.findOne({ where: { id } });
 
     if (!rank) {
