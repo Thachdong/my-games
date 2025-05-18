@@ -10,7 +10,7 @@ export class PlayerDto {
   @ApiProperty({ description: 'Name of the player' })
   @IsString()
   @IsNotEmpty()
-  name: string;
+  username: string;
 
   @ApiProperty({ description: 'Score of the player' })
   @IsNumber()

@@ -12,56 +12,63 @@ import { CreateGameDto } from './dto/create-game.dto';
 import { GameService } from './game.service';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { CreateMoveDto } from './dto/create-move.dto';
+import { IGameController } from 'app/game/interfaces';
+import { HttpResponse } from 'common/http-response';
+import { GenericApiResponse } from 'decorators/generic-api-response.decorator';
 
 @ApiTags('game')
 @Controller('game')
-export class GameController {
+export class GameController implements IGameController {
   constructor(private readonly _gameService: GameService) {}
-  /**
-   * Create a new game
-   */
   @ApiOperation({ summary: 'Create a new game' })
-  @ApiResponse({
+  @GenericApiResponse({
     status: HttpStatus.CREATED,
     description: 'Game created successfully',
   })
-  @ApiResponse({
+  @GenericApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid data provided',
   })
-  @ApiResponse({
+  @GenericApiResponse({
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized access',
   })
   @Post()
-  create(@Body() data: CreateGameDto) {
-    this._gameService.createGame(data);
+  async create(@Body() data: CreateGameDto): Promise<HttpResponse<void>> {
+    await this._gameService.createGame(data);
+
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Create game successfully',
+    };
   }
 
-  /**
-   * Update an existing game
-   */
   @ApiOperation({ summary: 'Update an existing game' })
-  @ApiResponse({
+  @GenericApiResponse({
     status: HttpStatus.OK,
     description: 'Game updated successfully',
   })
-  @ApiResponse({
+  @GenericApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid data provided',
   })
-  @ApiResponse({
+  @GenericApiResponse({
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized access',
   })
   @Patch(':id')
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() data: UpdateGameDto) {
-    this._gameService.updateGame(id, data);
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() data: UpdateGameDto
+  ): Promise<HttpResponse<void>> {
+    await this._gameService.updateGame(id, data);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Update game successfully',
+    };
   }
 
-  /**
-   * Add a move to the game
-   */
   @ApiOperation({ summary: 'Add a move to the game' })
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -76,9 +83,17 @@ export class GameController {
     description: 'Unauthorized access',
   })
   @Post(':id/move')
-  addMove(@Param('id', ParseUUIDPipe) id: string, @Body() data: CreateMoveDto) {
+  async addMove(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() data: CreateMoveDto
+  ): Promise<HttpResponse<void>> {
     const move = Object.assign(data, { gameId: id });
 
-    this._gameService.addMove(move);
+    await this._gameService.addMove(move);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: "Add move to game success!"
+    }
   }
 }

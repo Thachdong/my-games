@@ -2,37 +2,33 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Game } from './entities/game.entity';
 import { Repository } from 'typeorm';
-import { UpdateGameDto } from './dto/update-game.dto';
-import { CreateGameDto } from './dto/create-game.dto';
-import { CreateMoveDto } from './dto/create-move.dto';
 import { Move } from './entities/move.entity';
+import { IGameService } from 'app/game/interfaces';
+import { CreateGameDto, CreateMoveDto, GameDto, UpdateGameDto } from "app/game/dto";
+
 
 @Injectable()
-export class GameService {
+export class GameService implements IGameService {
   constructor(
     @InjectRepository(Game) private readonly _gameRepository: Repository<Game>,
     @InjectRepository(Move) private readonly _moveRepository: Repository<Move>
   ) {}
 
-  /**
-   * Create game
-   * @param data
-   * @returns game
-   */
-  async createGame(data: CreateGameDto) {
+  async createGame(data: CreateGameDto): Promise<GameDto> {
     const game = this._gameRepository.create(data);
 
     await this._gameRepository.save(game);
 
-    return game;
+    const gameDto: GameDto = {
+      ...game,
+      moves: [],
+      players: []
+    };
+
+    return gameDto;
   }
 
-  /**
-   * update game
-   * @param id
-   * @param data
-   */
-  async updateGame(id: string, data: UpdateGameDto) {
+  async updateGame(id: string, data: UpdateGameDto): Promise<GameDto | void> {
     const game = await this._gameRepository.findOne({ where: { id } });
 
     if (!game) {
@@ -46,17 +42,15 @@ export class GameService {
 
     await this._gameRepository.save(game);
 
-    return game;
+    return {
+      ...game,
+      moves: game.moves.map(move => ({ ...move, gameId: game.id }))
+    };
   }
 
-  /**
-   * Add move to game
-   * @param data
-   * @returns move
-   */
-  async addMove(data: CreateMoveDto) {
-    const game = this._moveRepository.create(data);
+  async addMove(data: CreateMoveDto): Promise<void> {
+    const move = this._moveRepository.create(data);
 
-    return this._gameRepository.save(game);
+    await this._moveRepository.save(move);
   }
 }
