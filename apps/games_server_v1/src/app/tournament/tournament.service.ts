@@ -3,26 +3,22 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Tournament } from './entities/tournament.entity';
 import { Repository } from 'typeorm';
 import { CreateTournamentDto } from './dto/create-tournament.dto';
-import { TournamentRank } from './entities/tournament-rank.entity';
-import { CreateTournamentRankDto } from './dto/create-tournament-rank.dto';
-import { UpdateTournamentRankDto } from './dto/update-tournament-rank.dto';
 import { User } from '../user/entities/user.entity';
+import { ITournamentService } from 'app/tournament/interfaces';
+import { GetTournamentDto } from 'app/tournament/dto';
+import { IPaginate } from 'types/paginate';
+import { PAGE_SIZE } from 'app/constants';
 
 @Injectable()
-export class TournamentService {
+export class TournamentService implements ITournamentService {
   constructor(
     @InjectRepository(Tournament)
     private readonly _tournamentRepository: Repository<Tournament>,
-    @InjectRepository(TournamentRank)
-    private readonly _rankRepository: Repository<TournamentRank>,
     @InjectRepository(User)
     private readonly _userRepository: Repository<User>
   ) {}
 
-  /**
-   * Create tournament
-   */
-  async create(data: CreateTournamentDto): Promise<Tournament> {
+  async create(data: CreateTournamentDto): Promise<GetTournamentDto> {
     const tournament = this._tournamentRepository.create({ ...data });
 
     await this._tournamentRepository.save(tournament);
@@ -30,17 +26,27 @@ export class TournamentService {
     return tournament;
   }
 
-  /**
-   * Get tournament
-   */
-  async getAll(): Promise<Tournament[]> {
-    return this._tournamentRepository.find();
+  async getAll(
+    page?: number,
+    limit?: number
+  ): Promise<IPaginate<GetTournamentDto>> {
+    const take = limit || PAGE_SIZE;
+    const skip = ((page || 1) - 1) * (limit || PAGE_SIZE);
+
+    const [tournaments, total] = await this._tournamentRepository.findAndCount({
+      take,
+      skip,
+    });
+
+    return {
+      page: page || 1,
+      limit: limit || PAGE_SIZE,
+      total,
+      data: tournaments,
+    };
   }
 
-  /**
-   * Update tournament title
-   */
-  async updateTitle(id: string, title: string): Promise<Tournament> {
+  async updateTitle(id: string, title: string): Promise<GetTournamentDto> {
     const tournament = await this._tournamentRepository.findOne({
       where: { id },
     });
@@ -59,77 +65,55 @@ export class TournamentService {
     return { ...newTournament };
   }
 
-  /**
-   * Create tournament rank
-   */
-  async createRank(data: CreateTournamentRankDto): Promise<TournamentRank> {
-    const rank = this._rankRepository.create({ ...data });
+  async playerJoin(tournamentId: string, userId: string): Promise<void> {
+    const tournament = await this._tournamentRepository.findOne({
+      where: { id: tournamentId },
+    });
 
-    await this._rankRepository.save(rank);
-
-    return rank;
-  }
-
-  /**
-   * Update rank
-   */
-  async updateRank(
-    id: string,
-    data: UpdateTournamentRankDto
-  ): Promise<TournamentRank | void> {
-    const rank = await this._rankRepository.findOne({ where: { id } });
-
-    if (!rank) {
+    if (!tournament) {
       throw new HttpException(
-        `Tournament with id ${id} not found!`,
+        `Tournament with id ${tournamentId} not found!`,
         HttpStatus.BAD_REQUEST
       );
     }
 
-    const newRank = { ...rank, ...data };
-
-    await this._rankRepository.save(newRank);
-
-    return newRank;
-  }
-
-  /**
-   * Player join
-   */
-  async playerJoin(tournamentId: string, userId: string): Promise<void> {
-    const tournament = await this._tournamentRepository.findOne({ where: { id: tournamentId } });
-
-    if (!tournament) {
-      throw new HttpException(`Tournament with id ${tournamentId} not found!`, HttpStatus.BAD_REQUEST);
-    }
-
     // Check if the user is already a player in the tournament
-    if (tournament.players.some(player => player.id === userId)) {
-      throw new HttpException(`User with id ${userId} is already a player in this tournament!`, HttpStatus.BAD_REQUEST);
+    if (tournament.players.some((player) => player.id === userId)) {
+      throw new HttpException(
+        `User with id ${userId} is already a player in this tournament!`,
+        HttpStatus.BAD_REQUEST
+      );
     }
 
     // Add the new player to the tournament's players
-    const userRef = this._userRepository.create({ id: userId })
+    const userRef = this._userRepository.create({ id: userId });
 
-    tournament.players.push(userRef)
+    tournament.players.push(userRef);
 
     await this._tournamentRepository.save(tournament);
   }
 
-  /**
-   * Player leave
-   */
   async playerLeave(tournamentId: string, userId: string): Promise<void> {
-    const tournament = await this._tournamentRepository.findOne({ where: { id: tournamentId } });
+    const tournament = await this._tournamentRepository.findOne({
+      where: { id: tournamentId },
+    });
 
     if (!tournament) {
-      throw new HttpException(`Tournament with id ${tournamentId} not found!`, HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        `Tournament with id ${tournamentId} not found!`,
+        HttpStatus.BAD_REQUEST
+      );
     }
 
     // Check if the user is a player in the tournament
-    const playerIndex = tournament.players.findIndex(player => player.id === userId);
+    const playerIndex = tournament.players.findIndex(
+      (player) => player.id === userId
+    );
     if (playerIndex === -1) {
-      throw new HttpException(`User with id ${userId} is not a player in this tournament!`, HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        `User with id ${userId} is not a player in this tournament!`,
+        HttpStatus.BAD_REQUEST
+      );
     }
 
     // Remove the player from the tournament's players
