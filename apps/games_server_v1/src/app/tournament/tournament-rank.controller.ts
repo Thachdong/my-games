@@ -22,6 +22,9 @@ import {
 export class TournamentRankController implements ITournamentRankController {
   constructor(private readonly _service: TournamentRankService) {}
 
+  /**
+   * ============================ create =================================
+   */
   @ApiOperation({ summary: 'Create tournament rank' })
   @GenericApiResponse({
     status: HttpStatus.CREATED,
@@ -47,6 +50,9 @@ export class TournamentRankController implements ITournamentRankController {
     };
   }
 
+  /**
+   * ============================ updateRank =================================
+   */
   @ApiOperation({ summary: 'Update tournament ranking' })
   @GenericApiResponse({
     status: HttpStatus.OK,

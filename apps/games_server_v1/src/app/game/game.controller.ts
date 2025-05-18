@@ -20,6 +20,10 @@ import { GenericApiResponse } from 'decorators/generic-api-response.decorator';
 @Controller('game')
 export class GameController implements IGameController {
   constructor(private readonly _gameService: GameService) {}
+
+  /**
+   * ============================ create =================================
+   */
   @ApiOperation({ summary: 'Create a new game' })
   @GenericApiResponse({
     status: HttpStatus.CREATED,
@@ -43,6 +47,9 @@ export class GameController implements IGameController {
     };
   }
 
+  /**
+   * ============================ update =================================
+   */
   @ApiOperation({ summary: 'Update an existing game' })
   @GenericApiResponse({
     status: HttpStatus.OK,
@@ -69,6 +76,9 @@ export class GameController implements IGameController {
     };
   }
 
+  /**
+   * ============================ addMove =================================
+   */
   @ApiOperation({ summary: 'Add a move to the game' })
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -93,7 +103,7 @@ export class GameController implements IGameController {
 
     return {
       statusCode: HttpStatus.OK,
-      message: "Add move to game success!"
-    }
+      message: 'Add move to game success!',
+    };
   }
 }
