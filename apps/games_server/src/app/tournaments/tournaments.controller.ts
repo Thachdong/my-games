@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, ParseUUIDPipe } from '@nestjs/common';
 import { TournamentsService } from './tournaments.service';
 import { WsJwtGuard } from '../auth/guards/ws-jwt.guard';
 
@@ -13,7 +13,7 @@ export class TournamentsController {
   }
 
   @Get(':id')
-  async getTournament(@Param('id') id: string) {
+  async getTournament(@Param('id', ParseUUIDPipe) id: string) {
     return this.tournamentsService.getTournament(id);
   }
 } 
