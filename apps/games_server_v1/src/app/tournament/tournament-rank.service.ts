@@ -8,6 +8,8 @@ import {
   GetTournamentRankDto,
   UpdateTournamentRankDto,
 } from 'app/tournament/dto';
+import { PAGE_SIZE } from 'app/constants';
+import { IPaginate } from 'types/paginate';
 
 @Injectable()
 export class TournamentRankService implements ITournamentRankService {
@@ -26,6 +28,23 @@ export class TournamentRankService implements ITournamentRankService {
     return {
       ...rank,
       tournamentId: rank.tournament.id,
+    };
+  }
+
+  async getAll(
+    page?: number,
+    limit?: number
+  ): Promise<IPaginate<GetTournamentRankDto>> {
+    const take = limit || PAGE_SIZE;
+    const skip = ((page || 1) - 1) * (limit || PAGE_SIZE);
+
+    const [ranks, total] = await this._repository.findAndCount({ take, skip });
+
+    return {
+      page: page || 1,
+      limit: limit || PAGE_SIZE,
+      total,
+      data: ranks.map((r) => ({ ...r, tournamentId: r.tournament.id })),
     };
   }
 

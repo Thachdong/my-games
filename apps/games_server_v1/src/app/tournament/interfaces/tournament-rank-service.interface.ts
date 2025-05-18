@@ -1,7 +1,12 @@
-import { CreateTournamentRankDto, GetTournamentRankDto, UpdateTournamentRankDto } from "app/tournament/dto";
+import { IPaginate } from 'types/paginate';
+import {
+  CreateTournamentRankDto,
+  GetTournamentRankDto,
+  UpdateTournamentRankDto,
+} from 'app/tournament/dto';
 
 export interface ITournamentRankService {
-    /**
+  /**
    * Description: Create tournament rank
    * @param data - CreateTournamentRankDto
    * @returns Promise<TournamentRank>
@@ -10,6 +15,17 @@ export interface ITournamentRankService {
    * - HttpStatus.BAD_REQUEST - user already leaved
    */
   createRank(data: CreateTournamentRankDto): Promise<GetTournamentRankDto>;
+
+  /**
+   * Description: Get all ranks
+   * @param page - number - optional
+   * @param limit - number - optional
+   * @returns Promise<IPaginate<GetTournamentRankDto>>
+   */
+  getAll(
+    page?: number,
+    limit?: number
+  ): Promise<IPaginate<GetTournamentRankDto>>;
 
   /**
    * Description: Update tournament rank

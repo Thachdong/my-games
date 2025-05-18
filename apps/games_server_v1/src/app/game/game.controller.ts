@@ -7,7 +7,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateGameDto } from './dto/create-game.dto';
 import { GameService } from './game.service';
 import { UpdateGameDto } from './dto/update-game.dto';
@@ -17,6 +17,7 @@ import { HttpResponse } from 'common/http-response';
 import { GenericApiResponse } from 'decorators/generic-api-response.decorator';
 
 @ApiTags('game')
+@ApiBearerAuth('access-token')
 @Controller('game')
 export class GameController implements IGameController {
   constructor(private readonly _gameService: GameService) {}

@@ -18,6 +18,17 @@ export interface ITournamentRankController {
   ): Promise<HttpResponse<GetTournamentRankDto>>;
 
   /**
+   * Description: Get all ranks
+   * @param page - number - optional
+   * @param limit - number - optional
+   * @returns Promise<HttpResponse<GetTournamentRankDto[]>>
+   */
+  getAll(
+    page?: number,
+    limit?: number
+  ): Promise<HttpResponse<GetTournamentRankDto[]>>;
+
+  /**
    * Description: Update rank by id
    * @param id - UUID
    * @param data - UpdateTournamentRankDto
