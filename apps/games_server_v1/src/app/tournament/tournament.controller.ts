@@ -13,16 +13,17 @@ import { CreateTournamentDto } from './dto/create-tournament.dto';
 import {
   UpdateTournamentTitleDto,
   TournamentPlayerDto,
-} from './dto/update-tournament.dto';
-import { UpdateTournamentRankDto } from './dto/update-tournament-rank.dto';
+} from 'app/tournament/dto';
+import { ITournamentController } from 'app/tournament/interfaces';
 
 @ApiTags('tournament')
 @Controller('tournament')
-export class TournamentController {
-  constructor(private readonly _tournamentService: TournamentService) {}
-
+export class TournamentController implements ITournamentController {
+  constructor(
+    private readonly _tournamentService: TournamentService,
+  ) {}
   /**
-   * Create tournament
+   * ============================ create =================================
    */
   @ApiOperation({ summary: 'Create tournament' })
   @ApiResponse({
@@ -46,8 +47,8 @@ export class TournamentController {
     this._tournamentService.create(data);
   }
 
-  /**
-   * Update tournament
+   /**
+   * ============================ updateTournament =================================
    */
   @ApiOperation({ summary: 'Update tournament (title)' })
   @ApiResponse({
@@ -74,8 +75,8 @@ export class TournamentController {
     this._tournamentService.updateTitle(id, data.title);
   }
 
-  /**
-   * Update tournament
+   /**
+   * ============================ playerJoin =================================
    */
   @ApiOperation({ summary: 'Player join tournament' })
   @ApiResponse({
@@ -102,8 +103,8 @@ export class TournamentController {
     this._tournamentService.playerJoin(id, data.userId);
   }
 
-  /**
-   * Update tournament
+   /**
+   * ============================ playerLeave =================================
    */
   @ApiOperation({ summary: 'Update tournament (title)' })
   @ApiResponse({
@@ -128,33 +129,5 @@ export class TournamentController {
     data: TournamentPlayerDto
   ) {
     this._tournamentService.playerLeave(id, data.userId);
-  }
-
-  /**
-   * Update rank
-   */
-  @ApiOperation({ summary: 'Update tournament ranking' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Ranking updated successfully',
-  })
-  @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    description: 'Invalid data provided',
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description: 'Unauthorized access',
-  })
-  @ApiResponse({
-    status: HttpStatus.FORBIDDEN,
-    description: 'Access forbidden',
-  })
-  @Patch(':rankId/rank')
-  updateRank(
-    @Param('rankId', ParseUUIDPipe) id: string,
-    @Body() data: UpdateTournamentRankDto
-  ) {
-    this._tournamentService.updateRank(id, data);
   }
 }

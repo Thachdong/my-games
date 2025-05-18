@@ -1,0 +1,32 @@
+import {
+  CreateTournamentRankDto,
+  GetTournamentRankDto,
+  UpdateTournamentRankDto,
+} from 'app/tournament/dto';
+import { HttpResponse } from 'common';
+
+export interface ITournamentRankController {
+  /**
+   * Description: Create tournament rank
+   * @param data -
+   * @returns <GetTournamentRankDto>>
+   * Exceptions:
+   * - HttpStatus.BAD_REQUEST
+   */
+  create(
+    data: CreateTournamentRankDto
+  ): Promise<HttpResponse<GetTournamentRankDto>>;
+
+  /**
+   * Description: Update rank by id
+   * @param id - UUID
+   * @param data - UpdateTournamentRankDto
+   * @returns Promise<HttpResponse<GetTournamentRankDto | void>>
+   * Exceptions:
+   * - HttpStatus.BAD_REQUEST
+   */
+  updateRank(
+    id: string,
+    data: UpdateTournamentRankDto
+  ): Promise<HttpResponse<null>>;
+}

@@ -6,11 +6,12 @@ import { TournamentRank } from 'app/tournament/entities/tournament-rank.entity';
 import { User } from 'app/user/entities/user.entity';
 import { TournamentService } from 'app/tournament/tournament.service';
 import { TournamentRankService } from 'app/tournament/tournament-rank.service';
+import { TournamentRankController } from 'app/tournament/tournament-rank.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Tournament, TournamentRank, User])],
   providers: [TournamentService, TournamentRankService],
   exports: [],
-  controllers: [TournamentController],
+  controllers: [TournamentController, TournamentRankController],
 })
 export class TournamentModule {}
