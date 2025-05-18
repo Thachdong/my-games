@@ -1,4 +1,3 @@
-import { IPaginate } from 'types';
 import {
   CreateGameDto,
   CreateMoveDto,
