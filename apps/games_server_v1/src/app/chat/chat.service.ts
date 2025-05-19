@@ -32,9 +32,12 @@ export class ChatService implements IChatService {
   async createMessage(data: CreateMessageDto): Promise<GetMessageDto> {
     const message = this._messageRepository.create(data);
 
-    const { user, ...savedMessage } = await this._messageRepository.save(
-      message
-    );
+    await this._messageRepository.save(message);
+
+    const { user, ...savedMessage } = await this._messageRepository.findOne({
+      where: { id: message.id },
+      relations: ['user'],
+    });
 
     return {
       ...savedMessage,
