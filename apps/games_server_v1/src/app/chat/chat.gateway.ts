@@ -1,4 +1,7 @@
+import { GameMoveBodyDto, MessageBodyDto } from 'app/chat/dto';
 import {
+  ConnectedSocket,
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
@@ -7,6 +10,11 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { ChatService } from 'app/chat/chat.service';
+import { GameService } from 'app/game/game.service';
+import { CreateMoveDto } from 'app/game/dto';
+import { JwtService } from '@nestjs/jwt';
+import { UserService } from 'app/user/user.service';
 
 @WebSocketGateway()
 export class ChatGateway
@@ -15,54 +23,97 @@ export class ChatGateway
   @WebSocketServer()
   private readonly _server: Server;
 
-  afterInit(server: Server) {
+  constructor(
+    private readonly _chatService: ChatService,
+    private readonly _gameService: GameService,
+    private readonly _jwtService: JwtService,
+    private readonly _userService: UserService
+  ) {}
+
+  /**
+   * ============================= life circle methods =================================
+   */
+  afterInit() {
     console.log('WebSocket server initialized');
   }
 
   handleConnection(client: Socket) {
-    const { sockets } = this._server.sockets;
+    try {
+      const token = client.handshake.auth.token?.split(' ')[1];
 
-    console.log(`Client connected: ${client.id}`);
-    console.log(`Total connected clients: ${sockets.size}`);
+      if (!token) {
+        client.disconnect();
+        return;
+      }
+
+      const payload = this._jwtService.verify(token);
+      client.data.user = payload;
+      console.log(`Client connected: ${client.id}, user: ${payload.email}`);
+    } catch (error) {
+      console.error('Error during WebSocket connection:', error);
+      client.disconnect();
+    }
   }
 
   handleDisconnect(client: Socket) {
     console.log(`Client disconnected: ${client.id}`);
   }
 
+  /**
+   * ============================= socket events =================================
+   */
   @SubscribeMessage('message')
-  handleMessage(client: Socket, payload: any) {
-    console.log(`Message received from ${client.id}: ${payload}`);
-    this._server.emit('message', payload);
+  async handleMessage(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: MessageBodyDto
+  ) {
+    const { roomId, message } = payload;
+    const userId = client.data.user.id;
+
+    const result = await this._chatService.createMessage({
+      roomId,
+      userId,
+      content: message,
+    });
+
+    client.to(roomId).emit('message', result);
   }
 
-  @SubscribeMessage('joinRoom')
-  handleJoinRoom(client: Socket, room: string) {
-    client.join(room);
-    console.log(`Client ${client.id} joined room: ${room}`);
+  @SubscribeMessage('gameMove')
+  async handleGameAction(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: GameMoveBodyDto
+  ) {
+    const { gameId, positionX, positionY } = payload;
+    const userId = client.data.user.id;
+
+    const moveData: CreateMoveDto = {
+      userId,
+      gameId,
+      positionX,
+      positionY,
+      timestamp: new Date(),
+    };
+
+    const createdMove = await this._gameService.addMove(moveData);
+
+    client.to(gameId).emit('gameMove', createdMove);
   }
 
-  @SubscribeMessage('leaveRoom')
-  handleLeaveRoom(client: Socket, room: string) {
-    client.leave(room);
-    console.log(`Client ${client.id} left room: ${room}`);
-  }
+  @SubscribeMessage('userJoinedGame')
+  async handleJoinRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() roomId: string
+  ) {
+    const userId = client.data.user.id;
+    const user = await this._userService.getUserById(userId);
 
-  @SubscribeMessage('typing')
-  handleTyping(client: Socket, room: string) {
-    client.to(room).emit('typing', { userId: client.id });
-    console.log(`Client ${client.id} is typing in room: ${room}`);
-  }
+    if (user) {
+      await this._gameService.joinGame(roomId, user);
 
-  @SubscribeMessage('stopTyping')
-  handleStopTyping(client: Socket, room: string) {
-    client.to(room).emit('stopTyping', { userId: client.id });
-    console.log(`Client ${client.id} stopped typing in room: ${room}`);
-  }
-
-  @SubscribeMessage('gameAction')
-  handleGameAction(client: Socket, { room, move }: { room: string; move: any }) {
-    client.to(room).emit('gameMove', { userId: client.id, move });
-    console.log(`Client ${client.id} made a move in room: ${room}`);
+      client.to(roomId).emit('userJoinedGame', {
+        userId: user.id,
+      });
+    }
   }
 }

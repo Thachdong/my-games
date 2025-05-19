@@ -8,7 +8,7 @@ import { Move } from './entities/move.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Game, Move])],
   providers: [GameService],
-  exports: [],
+  exports: [GameService],
   controllers: [GameController]
 })
 export class GameModule {}

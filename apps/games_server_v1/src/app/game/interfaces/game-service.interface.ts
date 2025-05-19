@@ -3,6 +3,8 @@ import {
   CreateGameDto,
   CreateMoveDto,
   GameDto,
+  GetMoveDto,
+  PlayerDto,
   UpdateGameDto,
 } from 'app/game/dto';
 
@@ -46,5 +48,14 @@ export interface IGameService {
    * @param data - CreateMoveDto
    * @reutrns void
    */
-  addMove(data: CreateMoveDto): Promise<void>;
+  addMove(data: CreateMoveDto): Promise<GetMoveDto>;
+
+  /**
+   * Description: Player join game
+   * @param gameId - UUID - game id
+   * @param player - PlayerDto - player
+   * @returns Promise<void>
+   * @throws NOT_FOUND
+   */
+  joinGame(gameId: string, player: PlayerDto): Promise<void>;
 }
