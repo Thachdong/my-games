@@ -8,10 +8,12 @@ import {
   CreateGameDto,
   CreateMoveDto,
   GameDto,
+  GetMoveDto,
   UpdateGameDto,
 } from 'app/game/dto';
 import { PAGE_SIZE } from 'app/constants';
 import { IPaginate } from 'types';
+import { User } from 'app/user/entities/user.entity';
 
 @Injectable()
 export class GameService implements IGameService {
@@ -88,9 +90,38 @@ export class GameService implements IGameService {
     };
   }
 
-  async addMove(data: CreateMoveDto): Promise<void> {
+  async addMove(data: CreateMoveDto): Promise<GetMoveDto> {
     const move = this._moveRepository.create(data);
 
-    await this._moveRepository.save(move);
+    const result = await this._moveRepository.save(move);
+
+    return { ...result, gameId: result.game.id, userId: result.userId };
+  }
+
+  async joinGame(gameId: string, player: User): Promise<void> {
+    const game = await this._gameRepository.findOne({
+      where: { id: gameId },
+      relations: ['players'],
+    });
+
+    if (!game) {
+      throw new HttpException(
+        `Game with id ${gameId} not found`,
+        HttpStatus.NOT_FOUND
+      );
+    }
+
+    const isPlayerAlreadyInGame = game.players.some((p) => p.id === player.id);
+
+    if (isPlayerAlreadyInGame) {
+      throw new HttpException(
+        `Player with id ${player.id} already in game`,
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
+    game.players.push(player);
+
+    await this._gameRepository.save(game);
   }
 }
