@@ -10,7 +10,7 @@ import {
   GetMessageDto,
 } from 'app/chat/dto';
 import { IPaginate } from 'types';
-import { PAGE_SIZE } from 'app/constants';
+import { PAGE_SIZE } from 'common/constants';
 
 @Injectable()
 export class ChatService implements IChatService {

@@ -20,7 +20,7 @@ import { EConfigKeys } from 'common/constants'
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env.game-v1',
+      envFilePath: '.env.game-api',
     }),
     TypeOrmModule.forRootAsync({
       useFactory: async () => ({

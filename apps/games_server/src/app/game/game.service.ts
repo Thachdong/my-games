@@ -11,7 +11,7 @@ import {
   GetMoveDto,
   UpdateGameDto,
 } from 'app/game/dto';
-import { PAGE_SIZE } from 'app/constants';
+import { PAGE_SIZE } from 'common/constants';
 import { IPaginate } from 'types';
 import { User } from 'app/user/entities/user.entity';
 

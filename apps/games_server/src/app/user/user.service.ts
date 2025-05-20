@@ -2,9 +2,9 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from './entities/user.entity';
-import { PAGE_SIZE } from '../constants';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { IPaginate } from '../../types/paginate';
+import { PAGE_SIZE } from 'common/constants';
+import { UpdateUserDto } from 'app/user/dto';
+import { IPaginate } from 'types/paginate';
 import { IUserService } from 'app/user/interfaces';
 import { GetUserDto } from 'app/user/dto';
 

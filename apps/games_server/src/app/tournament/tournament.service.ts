@@ -7,7 +7,7 @@ import { User } from '../user/entities/user.entity';
 import { ITournamentService } from 'app/tournament/interfaces';
 import { GetTournamentDto } from 'app/tournament/dto';
 import { IPaginate } from 'types/paginate';
-import { PAGE_SIZE } from 'app/constants';
+import { PAGE_SIZE } from 'common/constants';
 
 @Injectable()
 export class TournamentService implements ITournamentService {

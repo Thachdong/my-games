@@ -8,7 +8,7 @@ import {
   GetTournamentRankDto,
   UpdateTournamentRankDto,
 } from 'app/tournament/dto';
-import { PAGE_SIZE } from 'app/constants';
+import { PAGE_SIZE } from 'common/constants';
 import { IPaginate } from 'types/paginate';
 
 @Injectable()

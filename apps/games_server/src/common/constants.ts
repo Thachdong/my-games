@@ -2,6 +2,13 @@ export enum EMetadataKeys {
   IS_PUBLIC = 'isPublic',
 }
 
+export enum EProvide {
+  USER_REPOSITORY = "USER_REPOSITORY",
+  DATA_SOURCE = "DATA_SOURCE"
+}
+
+export const PAGE_SIZE = 25;
+
 export enum EConfigKeys {
   // JWT
   JWT_SECRET = 'JWT_SECRET',
