@@ -28,7 +28,7 @@ export interface IAuthConroller {
    * - 401: Unauthorized access
    */
   login(
-    data: Request & { user: GetUserDto }
+    authenticatedUser: GetUserDto
   ): Promise<HttpResponse<GetUserDto | void>>;
 
   /**

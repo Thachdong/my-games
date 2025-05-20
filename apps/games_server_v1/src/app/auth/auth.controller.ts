@@ -5,7 +5,6 @@ import {
   HttpStatus,
   Param,
   Post,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -20,6 +19,7 @@ import { LoginDto } from 'app/auth/dto/login.dto';
 import { LocalAuthGuard } from 'app/auth/guards/local-auth.guard';
 import { ResetPasswordDto } from 'app/auth/dto/reset-password.dto';
 import { IAuthConroller } from 'app/auth/interfaces/auth-controller.interface';
+import { CurrentUser } from 'app/auth/decorators';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -67,10 +67,8 @@ export class AuthController implements IAuthConroller {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(
-    @Req() req: Request & { user: GetUserDto }
+    @CurrentUser() user: GetUserDto
   ): Promise<HttpResponse<AuthenticatedUserDto | void>> {
-    const user = req.user;
-
     const authenticatedUser = await this._authService.login(user);
 
     return {
