@@ -1,36 +1,28 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { Game } from '../../games/entities/game.entity';
-import { ChatMessage } from './chat-message.entity';
+import { ChatMessage } from 'app/chat/entities/chat-message.entity';
+import { Game } from 'app/game/entities/game.entity';
+import { AbstractEntity } from 'common/abstract-entity';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 
 export enum ChatRoomType {
   PUBLIC = 'public',
   GAME = 'game',
 }
 
-@Entity('chat_rooms')
-export class ChatRoom {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
-  @Column()
+@Entity('chat_room')
+export class ChatRoom extends AbstractEntity {
+  @Column({ type: 'string' })
   name: string;
 
   @Column({ type: 'enum', enum: ChatRoomType, default: ChatRoomType.PUBLIC })
   type: ChatRoomType;
 
-  @Column({ nullable: true })
-  gameId: string;
+  @Column({ type: 'uuid', nullable: true })
+  gameId?: string;
 
-  @ManyToOne(() => Game, { nullable: true })
+  @OneToOne(() => Game, { nullable: true })
   @JoinColumn()
-  game: Game;
+  game?: Game;
 
-  @OneToMany(() => ChatMessage, message => message.room)
+  @OneToMany(() => ChatMessage, (message) => message.room)
   messages: ChatMessage[];
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-} 
+}

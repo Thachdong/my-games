@@ -1,4 +1,4 @@
-import { ResetPasswordDto } from './../dto/reset-password.dto';
+import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { GetUserDto } from 'app/user/dto/get-user.dto';
 import { RegisterDto } from 'app/auth/dto/register.dto';
 import { HttpResponse } from 'common/http-response';

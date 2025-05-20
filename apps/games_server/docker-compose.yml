@@ -5,11 +5,11 @@ services:
     image: postgres:15
     environment:
       POSTGRES_PASSWORD: dongt
-      POSTGRES_DB: gomoku
+      POSTGRES_DB: gomoku_v1
       POSTGRES_USER: dongt
-    container_name: game_db
+    container_name: game_db_v1
     ports:
-      - '5434:5432'
+      - '5435:5432'
     volumes:
       - game_db_data:/var/lib/postgresql/data
 
