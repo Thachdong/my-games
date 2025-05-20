@@ -8,6 +8,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { EConfigKeys } from 'common/constants';
+const cookieParser = require('cookie-parser')
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,6 +17,8 @@ async function bootstrap() {
 
   // Enable CORS
   app.enableCors();
+
+  app.use(cookieParser());
 
   // Enable validation
   const validationPipe = new ValidationPipe({

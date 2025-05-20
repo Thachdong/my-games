@@ -2,6 +2,7 @@ import { ResetPasswordDto } from './../dto/reset-password.dto';
 import { GetUserDto } from 'app/user/dto/get-user.dto';
 import { RegisterDto } from 'app/auth/dto/register.dto';
 import { HttpResponse } from 'common/http-response';
+import { Response } from 'express';
 
 export interface IAuthConroller {
   /**
@@ -28,7 +29,8 @@ export interface IAuthConroller {
    * - 401: Unauthorized access
    */
   login(
-    authenticatedUser: GetUserDto
+    authenticatedUser: GetUserDto,
+    res: Response,
   ): Promise<HttpResponse<GetUserDto | void>>;
 
   /**
@@ -39,7 +41,7 @@ export interface IAuthConroller {
    * - 200: Logout successful
    * - 400: Bad request
    */
-  logout(): Promise<HttpResponse<void>>;
+  logout(res: Response): Promise<HttpResponse<void>>;
 
   /**
    * Name: activate new account

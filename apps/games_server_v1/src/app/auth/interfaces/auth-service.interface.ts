@@ -22,7 +22,7 @@ export interface IAuthService {
    * - Generate jwt token
    * @returns Promise<AuthenticatedUserDto | void>
    */
-  login(user: GetUserDto): Promise<AuthenticatedUserDto | void>;
+  login(user: GetUserDto, startAt: number): Promise<AuthenticatedUserDto | void>;
 
   /**
    * TODO: Implement logout

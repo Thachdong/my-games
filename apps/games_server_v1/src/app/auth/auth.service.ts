@@ -55,9 +55,10 @@ export class AuthService implements IAuthService {
    */
   private async _generateJwtToken(
     userId: string,
-    email: string
+    email: string,
+    iat: number,
   ): Promise<string> {
-    const payload = { sub: userId, email };
+    const payload = { sub: userId, email, iat };
 
     return await this._jwtService.sign(payload);
   }
@@ -131,8 +132,8 @@ export class AuthService implements IAuthService {
     return user;
   }
 
-  async login(user: GetUserDto): Promise<AuthenticatedUserDto | void> {
-    const accessToken = await this._generateJwtToken(user.id, user.email);
+  async login(user: GetUserDto, startAt: number): Promise<AuthenticatedUserDto | void> {
+    const accessToken = await this._generateJwtToken(user.id, user.email, startAt);
 
     return {
       accessToken,
