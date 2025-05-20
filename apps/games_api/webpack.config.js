@@ -4,7 +4,7 @@ const { RunScriptWebpackPlugin } = require('run-script-webpack-plugin');
 
 module.exports = {
   output: {
-    path: join(__dirname, '../../dist/apps/games_server'),
+    path: join(__dirname, '../../dist/apps/games_api'),
   },
   plugins: [
     new NxAppWebpackPlugin({
