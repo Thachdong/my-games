@@ -5,10 +5,10 @@ import {
   HttpStatus,
   Param,
   Post,
-  Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RegisterDto } from './dto/register.dto';
 import { HttpResponse } from '../../common/http-response';
 import { AuthService } from './auth.service';
@@ -20,6 +20,8 @@ import { LoginDto } from 'app/auth/dto/login.dto';
 import { LocalAuthGuard } from 'app/auth/guards/local-auth.guard';
 import { ResetPasswordDto } from 'app/auth/dto/reset-password.dto';
 import { IAuthConroller } from 'app/auth/interfaces/auth-controller.interface';
+import { CurrentUser } from 'app/auth/decorators';
+import { Response } from 'express';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -63,15 +65,22 @@ export class AuthController implements IAuthConroller {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized access',
   })
+  @GenericApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'User is not active, verify email and activate your account first',
+  })
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(
-    @Req() req: Request & { user: GetUserDto }
+    @CurrentUser() user: GetUserDto,
+    @Res({ passthrough: true }) res: Response
   ): Promise<HttpResponse<AuthenticatedUserDto | void>> {
-    const user = req.user;
+    const startAt = new Date().getTime();
 
-    const authenticatedUser = await this._authService.login(user);
+    const authenticatedUser = await this._authService.login(user, startAt);
+
+    res.cookie('startAt', startAt, { httpOnly: true, secure: true, sameSite: 'strict' });
 
     return {
       statusCode: HttpStatus.OK,
@@ -83,6 +92,7 @@ export class AuthController implements IAuthConroller {
   /**
    * ============================ logout =================================
    */
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'User logout from the game' })
   @GenericApiResponse({
     status: HttpStatus.OK,
@@ -93,7 +103,9 @@ export class AuthController implements IAuthConroller {
     description: 'Bad request',
   })
   @Post('logout')
-  async logout() {
+  async logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('startAt', { httpOnly: true, secure: true, sameSite: 'strict' });
+
     return {
       statusCode: HttpStatus.OK,
       message: 'Logout successful',
