@@ -52,13 +52,13 @@ export const GameBoard: React.FC<Readonly<TGameBoardProps>> = ({
     ctx.strokeStyle = '#000';
 
     // Draw vertical lines
-    for (let x = 0; x <= canvas.width; x += 20) {
+    for (let x = 0; x <= canvas.width; x += CELL_SIZE) {
       ctx.moveTo(x, 0);
       ctx.lineTo(x, canvas.height);
     }
 
     // Draw horizontal lines
-    for (let y = 0; y <= canvas.height; y += 20) {
+    for (let y = 0; y <= canvas.height; y += CELL_SIZE) {
       ctx.moveTo(0, y);
       ctx.lineTo(canvas.width, y);
     }
@@ -69,20 +69,20 @@ export const GameBoard: React.FC<Readonly<TGameBoardProps>> = ({
     board.forEach((row) => {
       row.forEach((square) => {
         if (square.value) {
-          const x = square.position.x * 20;
-          const y = square.position.y * 20;
+          const x = square.position.x * CELL_SIZE;
+          const y = square.position.y * CELL_SIZE;
           if (square.value === 'X') {
             ctx.strokeStyle = 'red';
             ctx.beginPath();
-            ctx.moveTo(x + 4, y + 4);
-            ctx.lineTo(x + 16, y + 16);
-            ctx.moveTo(x + 16, y + 4);
-            ctx.lineTo(x + 4, y + 16);
+            ctx.moveTo(x + 6, y + 6);
+            ctx.lineTo(x + 26, y + 26);
+            ctx.moveTo(x + 26, y + 6);
+            ctx.lineTo(x + 6, y + 26);
             ctx.stroke();
           } else {
             ctx.strokeStyle = 'blue';
             ctx.beginPath();
-            ctx.arc(x + 10, y + 10, 6, 0, Math.PI * 2);
+            ctx.arc(x + 16, y + 16, 12, 0, Math.PI * 2);
             ctx.stroke();
           }
         }
