@@ -65,6 +65,10 @@ export class AuthController implements IAuthConroller {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized access',
   })
+  @GenericApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'User is not active, verify email and activate your account first',
+  })
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
