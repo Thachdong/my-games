@@ -16,6 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "game_caro_ui/*": ["libs/game_caro_ui/src/*"],
+      "game_caro/*": ["apps/game_caro/src/*"],
       "game_caro/Module": ["apps/game_caro/src/remote-entry.ts"]
     }
   },

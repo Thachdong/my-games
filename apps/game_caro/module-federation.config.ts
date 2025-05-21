@@ -4,8 +4,13 @@ const config: ModuleFederationConfig = {
   name: 'game_caro',
   exposes: {
     './Module': './src/remote-entry.ts',
-    "./GameCaroUi": "libs/game_caro_ui/src/index.ts",
   },
+  shared: (libraryName, defaultConfig) => {
+    if (libraryName === 'react' || libraryName === 'react-dom') {
+      return { ...defaultConfig, singleton: true, requiredVersion: 'auto' };
+    }
+    return defaultConfig;
+  }
 };
 
 /**

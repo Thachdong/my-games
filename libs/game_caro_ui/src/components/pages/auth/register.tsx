@@ -6,10 +6,11 @@ export const RegisterPage = () => {
     <div>
       <h1 className="text-3xl font-bold text-center mb-6">Register</h1>
       <Form method="post" className="max-w-md mx-auto">
+        <Input label="Username" name="username" />
         <Input label="Email" type="email" name="email" />
         <Input label="Password" type="password" name="password" />
-        <div className="text-right">
-          <Button type="submit">Submit</Button>
+        <div className="text-center">
+          <Button type="submit">REGISTER</Button>
         </div>
       </Form>
     </div>
