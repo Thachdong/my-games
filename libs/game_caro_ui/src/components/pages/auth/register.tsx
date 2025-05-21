@@ -1,0 +1,17 @@
+import { Button, Input } from 'game_caro_ui/components/atoms';
+import { Form } from 'react-router-dom';
+
+export const RegisterPage = () => {
+  return (
+    <div>
+      <h1 className="text-3xl font-bold text-center mb-6">Register</h1>
+      <Form method="post" className="max-w-md mx-auto">
+        <Input label="Email" type="email" name="email" />
+        <Input label="Password" type="password" name="password" />
+        <div className="text-right">
+          <Button type="submit">Submit</Button>
+        </div>
+      </Form>
+    </div>
+  );
+};
