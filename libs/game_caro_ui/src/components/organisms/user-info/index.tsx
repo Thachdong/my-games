@@ -17,7 +17,7 @@ export const UserInfo: React.FC<Readonly<TUserInfoProps>> = ({
         <strong>{name}</strong>
         {isCurrentPlayer && <span className="text-gray-500 ml-1">(you)</span>}
       </p>
-      
+
       <p>Player: {playerLabel}</p>
 
       <TurnTimer

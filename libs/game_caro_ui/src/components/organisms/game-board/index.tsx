@@ -1,7 +1,13 @@
 import React from 'react';
-import { ROWS, COLS, CELL_SIZE, BOARD_SIZE } from '../../libs/constants';
-import { IGame } from '../../libs/types';
-import { checkWinner, checkDraw } from '../../libs/utils';
+import {
+  ROWS,
+  COLS,
+  CELL_SIZE,
+  BOARD_SIZE,
+  IGame,
+  checkWinner,
+  checkDraw,
+} from 'game_caro_ui/libs';
 import './index.css';
 
 type TGameBoardProps = {
@@ -157,7 +163,15 @@ export const GameBoard: React.FC<Readonly<TGameBoardProps>> = ({
         setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
       }
     },
-    [board, currentPlayer, isDragging, gameStatus, setBoard, setCurrentPlayer, setGameStatus]
+    [
+      board,
+      currentPlayer,
+      isDragging,
+      gameStatus,
+      setBoard,
+      setCurrentPlayer,
+      setGameStatus,
+    ]
   );
   // #endregion
 
@@ -181,7 +195,11 @@ export const GameBoard: React.FC<Readonly<TGameBoardProps>> = ({
     <div
       ref={containerRef}
       className={`scrollbar-hidden border-4 border-gray-500`}
-      style={{ width: `${BOARD_SIZE}px`, height: `${BOARD_SIZE}px`, borderColor: gameStatus === 'playing' ? 'green' : 'gray'}}
+      style={{
+        width: `${BOARD_SIZE}px`,
+        height: `${BOARD_SIZE}px`,
+        borderColor: gameStatus === 'playing' ? 'green' : 'gray',
+      }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
@@ -192,7 +210,9 @@ export const GameBoard: React.FC<Readonly<TGameBoardProps>> = ({
         ref={canvasRef}
         id="game-caro-board"
         onMouseUp={handleCanvasClick}
-        className={`${gameStatus === 'playing' ? 'cursor-default' : 'cursor-not-allowed'}`}
+        className={`${
+          gameStatus === 'playing' ? 'cursor-default' : 'cursor-not-allowed'
+        }`}
       />
     </div>
   );

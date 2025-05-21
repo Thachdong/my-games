@@ -1,5 +1,5 @@
 import React from 'react';
-import { IGame } from '../../libs/types';
+import { IGame } from 'game_caro_ui/libs';
 
 type TGameHistoryProps = {
   board: IGame['squares'];

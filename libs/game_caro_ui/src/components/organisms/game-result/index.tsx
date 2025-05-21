@@ -1,4 +1,4 @@
-import { IGame } from '../../libs/types';
+import { IGame } from 'game_caro_ui/libs';
 
 type TGameResultProps = {
   gameStatus: IGame['gameStatus'];

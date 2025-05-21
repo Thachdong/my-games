@@ -1,11 +1,12 @@
 import React from 'react';
-import { IGame } from '../../libs/types';
-import { generateBoard } from '../../libs/utils';
-import { ChatBox } from '../chat-box';
-import { GameBoard } from '../game-board';
-import { GameHistory } from '../game-history';
-import { GameResult } from '../game-result';
-import { UserInfo } from '../user-info';
+import { IGame, generateBoard } from 'game_caro_ui/libs';
+import {
+  ChatBox,
+  GameBoard,
+  GameHistory,
+  UserInfo,
+  GameResult,
+} from 'game_caro_ui/components/organisms';
 
 export const GameCaro = () => {
   const [board, setBoard] = React.useState<IGame['squares']>(generateBoard());
