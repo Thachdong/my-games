@@ -1,7 +1,4 @@
 import axios, { AxiosInstance } from 'axios';
-const dotenv = require('dotenv');
-
-dotenv.config()
 
 class ApiService {
   private static instance: ApiService;
@@ -29,9 +26,25 @@ class ApiService {
     this.axiosInstance.interceptors.response.use(
       (response) => response,
       (error) => {
-        // Handle errors globally
-        console.error('API Error:', error);
-        return Promise.reject(error);
+        if (error instanceof axios.AxiosError) {
+          // Handle specific error codes
+          if (error.response) {
+            const status = error.response.status;
+            if (status === 401) {
+              // Handle unauthorized access
+              console.error('Unauthorized access - redirecting to login');
+              // Redirect to login or show a message
+            } else if (status === 403) {
+              // Handle forbidden access
+              console.error('Forbidden access - you do not have permission');
+            } else if (status >= 500) {
+              // Handle server errors
+              console.error('Server error - please try again later');
+            }
+          }
+        }
+
+        return Promise.reject(`Unknown error occurred: ${JSON.stringify(error)}`);
       }
     );
   }
