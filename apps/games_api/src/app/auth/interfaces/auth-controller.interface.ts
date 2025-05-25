@@ -1,8 +1,12 @@
-import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { GetUserDto } from 'app/user/dto/get-user.dto';
-import { RegisterDto } from 'app/auth/dto/register.dto';
 import { HttpResponse } from 'common/http-response';
 import { Response } from 'express';
+import {
+  ActivateDto,
+  ChangePasswordDto,
+  ForgotPasswordDto,
+  RegisterDto,
+} from 'app/auth/dto';
 
 export interface IAuthConroller {
   /**
@@ -30,7 +34,7 @@ export interface IAuthConroller {
    */
   login(
     authenticatedUser: GetUserDto,
-    res: Response,
+    res: Response
   ): Promise<HttpResponse<GetUserDto | void>>;
 
   /**
@@ -53,13 +57,32 @@ export interface IAuthConroller {
    * - 400: Token has expired
    * - 401: Unauthorized access
    */
-  activate(token: string): Promise<HttpResponse<void>>;
+  activate(data: ActivateDto): Promise<HttpResponse<void>>;
 
   /**
-   * Name: Reset password
-   * Description: Reset user password
-   * @body ResetPasswordDto - The reset password data
+   * Name: Forgot password
+   * Description: Send reset password email
+   * @param email: string - The user's email
+   * @implements
+   * - Check if the user with the provided email exists
+   * - Send reset password code to the user's email
    * @returns void
+   * Exceptions:
+   * - 400: Invalid email format
+   * - 404: User not found
+   * - 403: User is not active
    */
-  resetPassword(data: ResetPasswordDto): Promise<HttpResponse<void>>;
+  forgotPassword(data: ForgotPasswordDto): Promise<HttpResponse<void>>;
+
+  /**
+   * Name: Change password
+   * Description: Change user password
+   * @param data: ResetPasswordDto - The change password data
+   * @returns void
+   * Exceptions:
+   * - 400: Invalid password format
+   * - 404: User not found
+   * - 409: Old password is incorrect
+   */
+  changePassword(data: ChangePasswordDto): Promise<HttpResponse<void>>;
 }

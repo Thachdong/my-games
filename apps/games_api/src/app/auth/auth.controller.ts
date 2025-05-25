@@ -1,27 +1,29 @@
 import {
   Body,
   Controller,
-  Get,
   HttpStatus,
-  Param,
   Post,
   Res,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { RegisterDto } from './dto/register.dto';
 import { HttpResponse } from '../../common/http-response';
 import { AuthService } from './auth.service';
 import { GenericApiResponse } from 'decorators/generic-api-response.decorator';
 import { AuthenticatedUserDto } from 'app/auth/dto/authenticated-user.dto';
 import { GetUserDto } from 'app/user/dto/get-user.dto';
 import { Public } from 'app/auth/decorators/public.decorator';
-import { LoginDto } from 'app/auth/dto/login.dto';
 import { LocalAuthGuard } from 'app/auth/guards/local-auth.guard';
-import { ResetPasswordDto } from 'app/auth/dto/reset-password.dto';
 import { IAuthConroller } from 'app/auth/interfaces/auth-controller.interface';
 import { CurrentUser } from 'app/auth/decorators';
 import { Response } from 'express';
+import {
+  ActivateDto,
+  ChangePasswordDto,
+  RegisterDto,
+  LoginDto,
+  ForgotPasswordDto,
+} from 'app/auth/dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -67,7 +69,8 @@ export class AuthController implements IAuthConroller {
   })
   @GenericApiResponse({
     status: HttpStatus.FORBIDDEN,
-    description: 'User is not active, verify email and activate your account first',
+    description:
+      'User is not active, verify email and activate your account first',
   })
   @Public()
   @UseGuards(LocalAuthGuard)
@@ -80,7 +83,11 @@ export class AuthController implements IAuthConroller {
 
     const authenticatedUser = await this._authService.login(user, startAt);
 
-    res.cookie('startAt', startAt, { httpOnly: true, secure: true, sameSite: 'strict' });
+    res.cookie('startAt', startAt, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+    });
 
     return {
       statusCode: HttpStatus.OK,
@@ -104,7 +111,11 @@ export class AuthController implements IAuthConroller {
   })
   @Post('logout')
   async logout(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie('startAt', { httpOnly: true, secure: true, sameSite: 'strict' });
+    res.clearCookie('startAt', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+    });
 
     return {
       statusCode: HttpStatus.OK,
@@ -124,10 +135,11 @@ export class AuthController implements IAuthConroller {
     status: HttpStatus.BAD_REQUEST,
     description: 'Token has expired',
   })
+  @ApiBody({ type: ActivateDto })
   @Public()
-  @Get('activate/:token')
-  async activate(@Param('token') token: string): Promise<HttpResponse<void>> {
-    await this._authService.activate(token);
+  @Post('activate')
+  async activate(@Body() data: ActivateDto): Promise<HttpResponse<void>> {
+    await this._authService.activate(data);
 
     return {
       statusCode: HttpStatus.OK,
@@ -136,26 +148,61 @@ export class AuthController implements IAuthConroller {
   }
 
   /**
-   * ============================ resetPassword =================================
+   * ============================ forgotPassword =================================
    */
+  @ApiOperation({ summary: 'Send reset password email' })
   @GenericApiResponse({
     status: HttpStatus.OK,
-    description: 'Password reset successful',
+    description: 'Reset password email sent successfully',
   })
   @GenericApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: 'Invalid reset password data',
+    description: 'Invalid email format',
   })
+  @GenericApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'User not found',
+  })
+  @ApiBody({ type: ForgotPasswordDto })
   @Public()
-  @Post('reset-password')
-  async resetPassword(
-    @Body() data: ResetPasswordDto
+  @Post('forgot-password')
+  async forgotPassword(
+    @Body() data: ForgotPasswordDto
   ): Promise<HttpResponse<void>> {
-    await this._authService.resetPassword(data);
+    await this._authService.forgotPassword(data.email);
 
     return {
       statusCode: HttpStatus.OK,
-      message: 'Password reset successful',
+      message: 'Reset password email sent successfully',
+    };
+  }
+
+  /**
+   * ============================ changePassword =================================
+   */
+  @ApiOperation({ summary: 'Change user password' })
+  @GenericApiResponse({
+    status: HttpStatus.OK,
+    description: 'User password changed successfully',
+  })
+  @GenericApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid password format',
+  })
+  @GenericApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'User not found',
+  })
+  @Public()
+  @Post('change-password')
+  async changePassword(
+    @Body() changePasswordDto: ChangePasswordDto
+  ): Promise<HttpResponse<void>> {
+    await this._authService.changePassword(changePasswordDto);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'User password changed successfully',
     };
   }
 }
