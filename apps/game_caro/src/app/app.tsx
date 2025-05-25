@@ -1,11 +1,8 @@
-import { GameCaro } from '@/game_caro_ui';
+import { RouterProvider } from "react-router-dom";
+import { router } from "./routes/router";
 
-export function App() {
-  return (
-    <div className="p-4">
-      <GameCaro />
-    </div>
-  );
+function App() {
+  return <RouterProvider router={router} />
 }
 
 export default App;
