@@ -6,3 +6,7 @@ export const setLocalStorageService = <T>(key: string, value: T): void => {
     console.error(`Error setting localStorage for key "${key}":`, error);
   }
 };
+
+export enum ELocalStorageKeys {
+  AUTHENTICATED_USER = 'authenticatedUser',
+}

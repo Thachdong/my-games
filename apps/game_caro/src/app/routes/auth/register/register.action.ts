@@ -1,5 +1,4 @@
 import { registerService } from 'game_caro/services/auth.service';
-import { EPagePath } from 'game_caro/utils/constant';
 import {
   handleZodValidation,
   registerSchema,
@@ -8,10 +7,18 @@ import {
 import { ActionFunctionArgs } from 'react-router-dom';
 import { TActionResult } from 'game_caro/types';
 
+/**
+ * Handle user registration
+ * @implements
+ * - Collect form data from the request
+ * - Validate the data using Zod schema
+ * - Call the registration service
+ * - Return appropriate action result
+ * @returns 
+ */
 export async function registerAction({
   request,
 }: ActionFunctionArgs): Promise<TActionResult<'OK'>> {
-  // Parse and validate the form data
   const formData = await request.formData();
 
   const data: TRegisterForm = {
@@ -28,17 +35,13 @@ export async function registerAction({
     };
   }
 
-  // Call the register service
-  // const { error } = await registerService(data);
+  const { error } = await registerService(data);
 
-  // // Call the register service failed
-  // if (error) {
-  //   return {
-  //     serverError: typeof error === 'string' ? error : error.messages
-  //   };
-  // }
-
-  // Call the register service successfully, redirect to login page
+  if (error) {
+    return {
+      serverError: typeof error === 'string' ? error : error.messages
+    };
+  }
 
   return {
     data: 'OK',

@@ -14,12 +14,15 @@ export const apiEndpoints = {
     method: 'POST',
   },
   activate: {
-    path: '/auth/activate/:token',
-    method: 'GET',
-    getPath: (token: string) => `/auth/activate/${token}`,
+    path: '/auth/activate',
+    method: 'POST',
   },
-  resetPassword: {
-    path: '/auth/reset-password',
+  forgotPassword: {
+    path: '/auth/forgot-password',
+    method: 'POST',
+  },
+  changePassword: {
+    path: '/auth/change-password',
     method: 'POST',
   },
   getUsers: {

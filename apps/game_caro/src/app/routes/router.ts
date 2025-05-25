@@ -6,6 +6,10 @@ import { homeAction, homeLoader, HomePage } from './home';
 import { gameAction, gameLoader, GamePage } from './game';
 import { tournamentAction, tournamentLoader, TournamentPage } from './tournament';
 import { profileAction, profileLoader, ProfilePage } from './profile';
+import { ActivatePage } from './auth/activate';
+import { forgotPasswordAction, ForgotPasswordPage } from './auth/forgot-password';
+import { changePasswordAction, ChangePasswordPage } from './auth/change-password';
+import { activateAction } from './auth/activate/activate.action';
 
 export const router = createBrowserRouter([
   // AUTH ROUTES
@@ -25,6 +29,21 @@ export const router = createBrowserRouter([
         Component: RegisterPage,
         action: registerAction
       },
+      {
+        path: 'activate',
+        Component: ActivatePage,
+        action: activateAction,
+      },
+      {
+        path: 'forgot-password',
+        Component: ForgotPasswordPage,
+        action: forgotPasswordAction
+      },
+      {
+        path: 'change-password',
+        Component: ChangePasswordPage,
+        action: changePasswordAction
+      }
     ],
   },
   // HOME ROUTES

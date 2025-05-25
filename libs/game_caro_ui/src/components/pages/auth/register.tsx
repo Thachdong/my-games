@@ -1,5 +1,6 @@
 import { Button, ErrorMessage, Input } from 'game_caro_ui/components/atoms';
 import { useCustomActionData } from 'game_caro_ui/hooks';
+import { pagePaths } from 'game_caro_ui/libs';
 import { useEffect } from 'react';
 import { Form, useNavigate } from 'react-router-dom';
 
@@ -9,17 +10,21 @@ export const RegisterPage = () => {
 
   useEffect(() => {
     if (data === 'OK') {
-      navigate('/auth/login');
+      navigate(pagePaths.activate);
     }
   }, [data, navigate]);
 
   return (
-    <div className="flex flex-col justify-center">
+    <div className="w-full max-w-md mx-auto flex flex-col justify-center">
       <h1 className="text-3xl font-bold text-center mb-6">Register</h1>
 
-      <ErrorMessage className='text-center' errors={serverError} id="server-error" />
+      <ErrorMessage
+        className="text-center"
+        errors={serverError}
+        id="server-error"
+      />
 
-      <Form method="post" className="w-full max-w-md mx-auto">
+      <Form method="post">
         <Input
           label="Username"
           name="username"
@@ -37,10 +42,24 @@ export const RegisterPage = () => {
           name="password"
           errors={validationErrors?.password}
         />
-        <div className="text-center">
-          <Button type="submit">REGISTER</Button>
-        </div>
+
+        <Button className="w-full mt-4" type="submit">
+          REGISTER
+        </Button>
       </Form>
+
+      <p className="text-center mt-4">
+        Already have an account?{' '}
+        <a href={pagePaths.login} className="text-blue-500 hover:underline">
+          Login here
+        </a>
+      </p>
+
+      <p className="text-center mt-2">
+        <a href={pagePaths.activate} className="text-blue-500 hover:underline">
+          Activate your account
+        </a>
+      </p>
     </div>
   );
 };
