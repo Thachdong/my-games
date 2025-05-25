@@ -3,11 +3,12 @@
  * This is only a minimal backend to get started.
  */
 
-import { HttpStatus, Logger, ValidationPipe } from '@nestjs/common';
+import { BadRequestException, Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { EConfigKeys } from 'common/constants';
+
 const cookieParser = require('cookie-parser')
 
 async function bootstrap() {
@@ -25,11 +26,13 @@ async function bootstrap() {
     whitelist: true,
     transform: true,
     forbidNonWhitelisted: true,
-    exceptionFactory: (errors) => ({
-      statusCode: HttpStatus.BAD_REQUEST,
-      message: errors,
-    }),
+    exceptionFactory: (errors) => {
+      const messages = errors.map(err => Object.values(err.constraints)).flat();
+
+      return new BadRequestException(messages);
+    },
   });
+
   app.useGlobalPipes(validationPipe);
 
   // Setup Swagger documentation
