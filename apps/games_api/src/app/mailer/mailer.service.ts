@@ -9,11 +9,11 @@ import { IMailService } from './interfaces/mail-services.interface';
 export class MailerService implements IMailService {
   constructor(private readonly _mailerService: _MailerService) {}
 
-  async sendResetPasswordEmail(to: string, resetLink: string): Promise<void> {
+  async sendResetPasswordEmail(to: string, resetToken: string): Promise<void> {
     const subject = '___ reset password email!';
     const html = `
-      <h5>Please click below link to reset your password</h5>
-      <a href=${resetLink}>${resetLink}</a>
+      <h5>Use the following token to reset your password:</h5>
+      <p>${resetToken}</p>
     `;
 
     await this._mailerService.sendMail({
@@ -23,11 +23,10 @@ export class MailerService implements IMailService {
     });
   }
 
-  async sendActivateEmail(to: string, activateLink: string): Promise<void> {
+  async sendActivateEmail(to: string, verificationToken: string): Promise<void> {
     const subject = '___ activation email!';
     const html = `
-      <h5>Please click below link to activate user</h5>
-      <a href=${activateLink}>${activateLink}</a>
+      <h5>Your activation code is: ${verificationToken}</h5>
     `;
 
     await this._mailerService.sendMail({

@@ -1,3 +1,5 @@
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { ActivateDto } from './dto/activate.dto';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -9,10 +11,7 @@ import { AuthenticatedUserDto } from './dto/authenticated-user.dto';
 import { GetUserDto } from '../user/dto/get-user.dto';
 import { IAuthService } from './interfaces/auth-service.interface';
 import { MailerService } from 'app/mailer/mailer.service';
-import { TJwtPayload, TJwtPayloadForActivateAccount } from 'types/jwt';
 import { ConfigService } from '@nestjs/config';
-import { EConfigKeys } from 'common/constants';
-import { ResetPasswordDto } from 'app/auth/dto/reset-password.dto';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -91,18 +90,7 @@ export class AuthService implements IAuthService {
     await this._userRepository.save(user);
 
     // Send verification email
-    const payload: TJwtPayloadForActivateAccount = {
-      sub: user.id,
-      verificationToken,
-    };
-
-    const activateToken = await this._jwtService.sign(payload, {
-      expiresIn: this._configService.get<string>('JWT_ACTIVATION_EXPIRES_IN'), // Token expiration time set to one year
-    });
-
-    const verificationLink = `http://localhost:3000/auth/activate/${activateToken}`;
-
-    await this._mailerService.sendActivateEmail(user.email, verificationLink);
+    await this._mailerService.sendActivateEmail(user.email, verificationToken);
 
     delete user.password;
 
@@ -145,24 +133,22 @@ export class AuthService implements IAuthService {
     console.log(`Token invalidated: ${accessToken}`);
   }
 
-  async activate(token: string): Promise<void> {
-    const payload: TJwtPayloadForActivateAccount =
-      await this._jwtService.decode(token);
-
+  async activate({ email, verificationCode }: ActivateDto): Promise<void> {
     const user = await this._userRepository.findOne({
-      where: { id: payload.sub },
+      where: { email },
     });
 
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    if (user.verificationToken !== payload.verificationToken) {
+    if (user.verificationToken !== verificationCode) {
       throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
     }
 
     user.isEmailVerified = true;
     user.verificationToken = null;
+    user.isActive = true;
 
     await this._userRepository.save(user);
   }
@@ -180,38 +166,21 @@ export class AuthService implements IAuthService {
       );
     }
 
-    // Send email with reset password link
-    const payload: TJwtPayload = { sub: user.id, email: user.email };
-
-    const resetToken = await this._jwtService.sign(payload, {
-      expiresIn: this._configService.get<string>(
-        EConfigKeys.JWT_RESET_PASSWORD_EXPIRES_IN
-      ),
-    });
-
-    const resetLink =
-      this._configService.get<string>(EConfigKeys.CLIENT_RESET_PASSWORD_URL) +
-      `token=${resetToken}`;
-
-    await this._mailerService.sendResetPasswordEmail(user.email, resetLink);
-  }
-
-  async resetPassword(data: ResetPasswordDto): Promise<void> {
-    const payload = await this._jwtService.decode(data.token);
-
-    const user = await this._userRepository.findOne({
-      where: { id: payload.sub },
-    });
-
-    if (!user) {
-      throw new HttpException('Invalid token', HttpStatus.BAD_REQUEST);
+    if (user.isActive === false) {
+      throw new HttpException(
+        'User is not active, verify email and activate your account first',
+        HttpStatus.FORBIDDEN
+      );
     }
 
-    const hashedPassword = await this._hashPassword(data.password);
+    // Send email with reset password link
+    const resetToken = this._generateVerificationToken();
 
-    user.password = hashedPassword;
+    user.verificationToken = resetToken;
 
     await this._userRepository.save(user);
+
+    await this._mailerService.sendResetPasswordEmail(user.email, resetToken);
   }
 
   async getUserById(id: string): Promise<GetUserDto | void> {
@@ -227,5 +196,29 @@ export class AuthService implements IAuthService {
     }
 
     return user;
+  }
+
+  async changePassword(data: ChangePasswordDto) {
+    const user = await this._userRepository.findOne({
+      where: { email: data.email },
+    });
+
+    if (!user) {
+      throw new HttpException(
+        `User with email "${data.email}" does not exist!`,
+        HttpStatus.NOT_FOUND
+      );
+    }
+
+    if (user.verificationToken !== data.confirmHash) {
+      throw new HttpException(
+        'Invalid confirmation hash',
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
+    user.password = await this._hashPassword(data.password);
+
+    await this._userRepository.save(user);
   }
 }

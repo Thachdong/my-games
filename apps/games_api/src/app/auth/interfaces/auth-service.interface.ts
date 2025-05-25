@@ -1,7 +1,6 @@
 import { GetUserDto } from "app/user/dto/get-user.dto";
-import { RegisterDto } from "../dto/register.dto";
 import { AuthenticatedUserDto } from "../dto/authenticated-user.dto";
-import { ResetPasswordDto } from "app/auth/dto/reset-password.dto";
+import { RegisterDto, ChangePasswordDto, ActivateDto } from "app/auth/dto";
 
 export interface IAuthService {
   /**
@@ -42,7 +41,7 @@ export interface IAuthService {
    * - 400: User with ID does not exist
    * - 401: Unauthorized access
    */
-  activate(userId: string, token: string): Promise<void>;
+  activate(data: ActivateDto): Promise<void>;
 
   /**
    * Description: Forgot password
@@ -58,19 +57,19 @@ export interface IAuthService {
   forgotPassword(email: string): Promise<void>;
 
   /**
-   * Description: Reset password
-   * @param token: string
-   * @param password: string
-   * @implements
+   * Description: Change password
+   * @param data: ChangePasswordDto
+   * implements
    * - Check if user exists
-   * - Generate random password
-   * - Hash password
+   * - Check if confirmation hash is matching the verification token
    * - Update user password
-   * @returns Promise<string>
+   * @returns Promise<void>
    * Exceptions:
-   * - 400: User with ID does not exist
+   * - 400: User with email does not exist
+   * - 400: Invalid confirmation hash
    */
-  resetPassword(data: ResetPasswordDto): Promise<void>;
+  changePassword(data: ChangePasswordDto): Promise<void>;
+
   /**
    * Description: Validate user
    * @param email: string

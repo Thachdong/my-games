@@ -6,24 +6,30 @@ import { EConfigKeys } from 'common/constants';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      envFilePath: '.env.game-v1',
-      isGlobal: true,
-    }),
     _MailerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        transport: {
-          host: configService.get<string>(EConfigKeys.MAILER_HOST, 'localhost'),
-          port: Number(configService.get<string>(EConfigKeys.MAILER_PORT, '587')),
-          secure: true,
-          auth: {
-            user: configService.get<string>(EConfigKeys.MAILER_USERNAME),
-            pass: configService.get<string>(EConfigKeys.MAILER_PASSWORD),
+      useFactory: (configService: ConfigService) => {
+        console.log(
+          'MailerModule useFactory called with configService:',
+          configService.get<string>(EConfigKeys.MAILER_HOST)
+        );
+        return {
+          transport: {
+            host: configService.get<string>(
+              EConfigKeys.MAILER_HOST,
+            ),
+            port: Number(
+              configService.get<string>(EConfigKeys.MAILER_PORT, '587')
+            ),
+            secure: false,
+            auth: {
+              user: configService.get<string>(EConfigKeys.MAILER_USERNAME),
+              pass: configService.get<string>(EConfigKeys.MAILER_PASSWORD),
+            },
           },
-        },
-      }),
+        };
+      },
     }),
   ],
   controllers: [],

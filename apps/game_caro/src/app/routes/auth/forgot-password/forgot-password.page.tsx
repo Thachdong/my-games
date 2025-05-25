@@ -1,0 +1,5 @@
+import { ForgotPasswordPage as Page } from 'game_caro_ui/components/pages';
+
+export function ForgotPasswordPage() {
+  return <Page />;
+}
