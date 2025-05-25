@@ -1,17 +1,17 @@
 import { registerService } from 'game_caro/services/auth.service';
 import { EPagePath } from 'game_caro/utils/constant';
-import { registerValidator, TRegisterForm } from 'game_caro/validators';
-import { ActionFunctionArgs, redirect } from 'react-router-dom';
-
-export type TRegisterActionResult = {
-  validationErrors?: Record<string, string[]>;
-  serverError?: string;
-  data?: null;
-};
+import {
+  handleZodValidation,
+  registerSchema,
+  TRegisterForm,
+} from 'game_caro/validators';
+import { ActionFunctionArgs } from 'react-router-dom';
+import { TActionResult } from 'game_caro/types';
 
 export async function registerAction({
   request,
-}: ActionFunctionArgs): Promise<TRegisterActionResult> {
+}: ActionFunctionArgs): Promise<TActionResult<'OK'>> {
+  // Parse and validate the form data
   const formData = await request.formData();
 
   const data: TRegisterForm = {
@@ -20,25 +20,27 @@ export async function registerAction({
     password: formData.get('password') as string,
   };
 
-  const isValid = registerValidator.safeParse(data);
+  const { validationErrors } = handleZodValidation(registerSchema, data);
 
-  if (!isValid.success) {
+  if (validationErrors) {
     return {
-      validationErrors: isValid.error.formErrors.fieldErrors,
+      validationErrors,
     };
   }
 
-  const result = await registerService(data);
+  // Call the register service
+  // const { error } = await registerService(data);
 
-  if (result.error) {
-    return {
-      serverError: result.error,
-    };
-  }
+  // // Call the register service failed
+  // if (error) {
+  //   return {
+  //     serverError: typeof error === 'string' ? error : error.messages
+  //   };
+  // }
 
-  redirect(EPagePath.LOGIN);
+  // Call the register service successfully, redirect to login page
 
   return {
-    data: null,
+    data: 'OK',
   };
 }

@@ -1,12 +1,110 @@
 import axios, { AxiosInstance } from 'axios';
 
+export const apiEndpoints = {
+  login: {
+    path: '/auth/login',
+    method: 'POST',
+  },
+  register: {
+    path: '/auth/register',
+    method: 'POST',
+  },
+  logout: {
+    path: '/auth/logout',
+    method: 'POST',
+  },
+  activate: {
+    path: '/auth/activate/:token',
+    method: 'GET',
+    getPath: (token: string) => `/auth/activate/${token}`,
+  },
+  resetPassword: {
+    path: '/auth/reset-password',
+    method: 'POST',
+  },
+  getUsers: {
+    path: '/user',
+    method: 'GET',
+  },
+  getUserById: {
+    path: '/user/:id',
+    method: 'GET',
+    getPath: (id: string) => `/user/${id}`,
+  },
+  updateUser: {
+    path: '/user/:id',
+    method: 'PATCH',
+    getPatch: (id: string) => `/user/${id}`,
+  },
+  createGame: {
+    path: '/game',
+    method: 'POST',
+  },
+  getGames: {
+    path: '/game',
+    method: 'GET',
+  },
+  getGameById: {
+    path: '/game/:id',
+    method: 'GET',
+    getPath: (id: string) => `/game/${id}`,
+  },
+  updateGame: {
+    path: '/game/:id',
+    method: 'PATCH',
+    getPatch: (id: string) => `/game/${id}`,
+  },
+  addMoveToGame: {
+    path: '/game/:id/move',
+    method: 'POST',
+    getPath: (id: string) => `/game/${id}/move`,
+  },
+  createTournament: {
+    path: '/tournament',
+    method: 'POST'
+  },
+  getAllTournament: {
+    path: '/tournament',
+    method: 'GET'
+  },
+  getTournamentById: {
+    path: '/tournament/:id',
+    method: 'GET',
+    getPath: (id: string) => `/tournament/${id}`,
+  },
+  updateTournamentTitle: {
+    path: '/tournament/:id/title',
+    method: 'PATCH',
+    getPatch: (id: string) => `/tournament/${id}/title`,
+  },
+  joinTournament: {
+    path: '/tournament/:id/join',
+    method: 'PATCH',
+    getPatch: (id: string) => `/tournament/${id}/join`,
+  },
+  leaveTournament: {
+    path: '/tournament/:id/leave',
+    method: 'PATCH',
+    getPatch: (id: string) => `/tournament/${id}/leave`,
+  },
+  getRank: {
+    path: '/tournament-rank',
+    method: 'GET',
+  },
+  updateRank: {
+    path: '/tournament-rank/:id',
+    method: 'PATCH',
+    getPatch: (id: string) => `/tournament-rank/${id}`,
+  },
+};
+
 class ApiService {
   private static instance: ApiService;
   private axiosInstance: AxiosInstance;
 
   private constructor() {
     this.axiosInstance = axios.create({
-      baseURL: process.env.REACT_APP_API_URL || "http://localhost:3000/api",
+      baseURL: process.env.REACT_APP_API_URL || 'http://localhost:3000/api',
       timeout: parseInt(process.env.REACT_APP_API_TIMEOUT || '10000'), // default 10s
       headers: {
         'Content-Type': 'application/json',
@@ -44,7 +142,7 @@ class ApiService {
           }
         }
 
-        return Promise.reject(`Unknown error occurred: ${JSON.stringify(error)}`);
+        return Promise.reject(error);
       }
     );
   }

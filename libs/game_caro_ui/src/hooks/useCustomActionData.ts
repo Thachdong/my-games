@@ -1,5 +1,10 @@
-import { TActionResult } from "game_caro/types/react-router-dom";
 import { useActionData } from "react-router-dom";
+
+export type TActionResult<T> = {
+  validationErrors?: Record<string, string[]>;
+  serverError?: string | string[];
+  data?: T;
+}
 
 export function useCustomActionData<T>() {
   const actionData = useActionData() as TActionResult<T>;
@@ -9,6 +14,6 @@ export function useCustomActionData<T>() {
   return {
     validationErrors,
     data,
-    serverError
+    serverError,
   };
 }

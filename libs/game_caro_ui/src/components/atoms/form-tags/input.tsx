@@ -1,5 +1,6 @@
 import { genClassName } from 'game_caro_ui/libs';
 import React from 'react';
+import { ErrorMessage } from './error-messages';
 
 export type TInputProps = React.DetailedHTMLProps<
   React.InputHTMLAttributes<HTMLInputElement>,
@@ -7,18 +8,17 @@ export type TInputProps = React.DetailedHTMLProps<
 > & {
   name: string;
   label?: string;
-  error?: string;
+  errors?: string[];
   info?: string;
   containerClassName?: string;
 };
 
 const DEFAULT_CLASS_NAME = {
-  container: 'w-full mb-3',
+  container: 'w-full mb-3 block',
   input:
     'h-10 w-full px-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
   inputError: 'border-red-500 focus:ring-red-500 focus:border-red-500',
   infoText: 'mt-1 text-sm text-gray-500',
-  errorText: 'mt-1 text-sm text-red-600',
   label: 'block text-sm font-medium text-gray-700',
 };
 
@@ -26,17 +26,24 @@ export const Input: React.FC<TInputProps> = ({
   name,
   label,
   className,
-  error,
+  errors,
   info,
   containerClassName,
   ...props
 }) => {
   return (
-    <div className={genClassName(DEFAULT_CLASS_NAME.container, containerClassName)}>
+    <label
+      className={genClassName(DEFAULT_CLASS_NAME.container, containerClassName)}
+    >
       {label && (
-        <label htmlFor={name} className={DEFAULT_CLASS_NAME.label}>
+        <span
+          className={genClassName(
+            DEFAULT_CLASS_NAME.label,
+            errors ? 'text-red-500' : ''
+          )}
+        >
           {label}
-        </label>
+        </span>
       )}
       <input
         id={name}
@@ -44,26 +51,22 @@ export const Input: React.FC<TInputProps> = ({
         className={genClassName(
           DEFAULT_CLASS_NAME.input,
           className,
-          error ? DEFAULT_CLASS_NAME.inputError : ''
+          errors ? DEFAULT_CLASS_NAME.inputError : ''
         )}
-        aria-invalid={!!error}
+        aria-invalid={!!errors}
         aria-describedby={
-          error ? `${name}-error` : info ? `${name}-info` : undefined
+          errors ? `${name}-error` : info ? `${name}-info` : undefined
         }
         {...props}
       />
 
-      {error && (
-        <p id={`${name}-error`} className={DEFAULT_CLASS_NAME.errorText}>
-          {error}
-        </p>
-      )}
+      <ErrorMessage errors={errors || []} id={`${name}-error`} />
 
       {info && (
         <p id={`${name}-info`} className={DEFAULT_CLASS_NAME.infoText}>
           {info}
         </p>
       )}
-    </div>
+    </label>
   );
 };

@@ -1,26 +1,19 @@
-import { TRegisterForm } from 'game_caro/validators';
-import api from './api-service';
-import { AxiosError } from 'axios';
+import { TLoginForm, TRegisterForm } from 'game_caro/validators';
+import api, { apiEndpoints } from './api-service';
+import { createService } from 'game_caro/hocs/create-service';
 
 export type TRegisterService = typeof registerService;
 
-export async function registerService(
-  data: TRegisterForm
-) {
-  try {
-    await api.post('/auth/register', data);
+const handleRegister = async (data: TRegisterForm) => {
+  const response = await api.post<TRegisterForm, null>(apiEndpoints.register.path, data);
+  return response.data;
+};
 
-    return {
-      data: null,
-    };
-  } catch (error: unknown) {
-    if (error instanceof AxiosError) {
-      return {
-        error: error.response?.data,
-      };
-    }
-    return {
-      error: error,
-    };
-  }
+export const registerService = createService(handleRegister);
+
+const handleLogin = async (data: TLoginForm) => {
+  const response = await api.post<TLoginForm, null>(apiEndpoints.login.path, data);
+  return response.data;
 }
+
+export const loginService = createService<TLoginForm, null>(handleLogin);
