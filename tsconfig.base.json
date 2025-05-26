@@ -17,7 +17,7 @@
     "paths": {
       "game_caro/*": ["apps/game_caro/src/*"],
       "game_caro/Module": ["apps/game_caro/src/remote-entry.ts"],
-      "game_caro_ui/*": ["libs/game_caro_ui/src/*"]
+      "game_caro_package/*": ["libs/game_caro_package/src/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]

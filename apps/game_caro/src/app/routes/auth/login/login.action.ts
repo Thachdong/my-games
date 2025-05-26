@@ -1,14 +1,14 @@
-import { loginService } from 'game_caro/services/auth.service';
+import { loginService } from 'game_caro_package/services/auth.service';
 import {
   ELocalStorageKeys,
   setLocalStorageService,
-} from 'game_caro/services/localstorage.service';
-import { TActionResult } from 'game_caro/types';
+} from 'game_caro_package/services/localstorage.service';
+import { TActionResult } from 'game_caro_package/types';
 import {
   handleZodValidation,
   loginSchema,
   TLoginForm,
-} from 'game_caro/validators';
+} from 'game_caro_package/validators';
 import { ActionFunctionArgs } from 'react-router-dom';
 
 /**

@@ -1,11 +1,11 @@
-import { registerService } from 'game_caro/services/auth.service';
+import { registerService } from 'game_caro_package/services/auth.service';
 import {
   handleZodValidation,
   registerSchema,
   TRegisterForm,
-} from 'game_caro/validators';
+} from 'game_caro_package/validators';
 import { ActionFunctionArgs } from 'react-router-dom';
-import { TActionResult } from 'game_caro/types';
+import { TActionResult } from 'game_caro_package/types';
 
 /**
  * Handle user registration

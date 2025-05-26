@@ -1,10 +1,10 @@
-import { activateService } from 'game_caro/services/auth.service';
-import { TActionResult } from 'game_caro/types';
+import { activateService } from 'game_caro_package/services/auth.service';
+import { TActionResult } from 'game_caro_package/types';
 import {
   activateSchema,
   handleZodValidation,
   TActivateForm,
-} from 'game_caro/validators';
+} from 'game_caro_package/validators';
 import { ActionFunctionArgs } from 'react-router-dom';
 
 export async function activateAction({
