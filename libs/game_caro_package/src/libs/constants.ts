@@ -20,3 +20,7 @@ export enum EPagePath {
   TOURNAMENT = "/tournament",
   PROFILE = "/profile",
 }
+
+export const LOCAL_STORAGE_KEYS = {
+  AUTHENTICATED_USER: 'authenticatedUser',
+}
