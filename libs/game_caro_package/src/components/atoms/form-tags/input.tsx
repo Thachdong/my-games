@@ -1,5 +1,5 @@
 import { genClassName } from 'game_caro_package/libs';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { ErrorMessage } from './error-messages';
 
 export type TInputProps = React.DetailedHTMLProps<
@@ -11,6 +11,8 @@ export type TInputProps = React.DetailedHTMLProps<
   errors?: string[];
   info?: string;
   containerClassName?: string;
+  appendIcon?: ReactNode;
+  prependIcon?: ReactNode;
 };
 
 const DEFAULT_CLASS_NAME = {
@@ -29,6 +31,8 @@ export const Input: React.FC<TInputProps> = ({
   errors,
   info,
   containerClassName,
+  appendIcon,
+  prependIcon,
   ...props
 }) => {
   return (
@@ -45,6 +49,9 @@ export const Input: React.FC<TInputProps> = ({
           {label}
         </span>
       )}
+
+      { prependIcon }
+
       <input
         id={name}
         name={name}
@@ -59,6 +66,8 @@ export const Input: React.FC<TInputProps> = ({
         }
         {...props}
       />
+
+      { appendIcon }
 
       <ErrorMessage errors={errors || []} id={`${name}-error`} />
 

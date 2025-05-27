@@ -1,4 +1,5 @@
 import { Button, ErrorMessage, Input } from 'game_caro_package/components/atoms';
+import { InputPassword } from 'game_caro_package/components/atoms/form-tags/input-password';
 import { useCustomActionData } from 'game_caro_package/hooks';
 import { pagePaths } from 'game_caro_package/libs';
 import { useEffect } from 'react';
@@ -39,9 +40,8 @@ export const ChangePasswordPage = () => {
           errors={validationErrors?.currentPassword}
         />
 
-        <Input
+        <InputPassword
           label="Password"
-          type="password"
           name="password"
           errors={validationErrors?.password}
         />
