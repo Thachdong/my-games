@@ -15,7 +15,7 @@ export const ActivatePage = () => {
   }, [data, navigate]);
 
   return (
-    <div className="w-full max-w-md mx-auto flex flex-col justify-center">
+    <div className="w-full max-w-md mx-auto">
       <h1 className="text-3xl font-bold text-center mb-6">Activate</h1>
 
       <ErrorMessage
