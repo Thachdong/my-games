@@ -1,4 +1,8 @@
-import { TActivateForm, TLoginForm, TRegisterForm } from 'game_caro_package/validators';
+import {
+  TActivateForm,
+  TLoginForm,
+  TRegisterForm,
+} from 'game_caro_package/validators';
 import api from './api-service';
 import { apiEndpoints } from 'game_caro_package/services/api-service';
 import { createService } from 'game_caro_package/hocs/create-service';
@@ -34,7 +38,7 @@ export type TAuthenticatedUser = {
   gameLost: number;
   gameDraw: number;
   accessToken: string;
-}
+};
 
 const handleLogin = async (data: TLoginForm) => {
   const response = await api.post<TLoginForm, TAuthenticatedUser>(
@@ -44,7 +48,9 @@ const handleLogin = async (data: TLoginForm) => {
   return response.data;
 };
 
-export const loginService = createService<TLoginForm, TAuthenticatedUser>(handleLogin);
+export const loginService = createService<TLoginForm, TAuthenticatedUser>(
+  handleLogin
+);
 
 /**
  * ====================== Activate Service ======================
@@ -57,7 +63,9 @@ const handleActivate = async (data: TActivateForm) => {
   return response.data;
 };
 
-export const activateService = createService<TActivateForm, null>(handleActivate);
+export const activateService = createService<TActivateForm, null>(
+  handleActivate
+);
 
 /**
  * ====================== Forgot Password Service ======================
@@ -68,7 +76,7 @@ const handleForgotPassword = async (email: string) => {
     { email }
   );
   return response.data;
-}
+};
 export const forgotPasswordService = createService(handleForgotPassword);
 
 /**
@@ -78,7 +86,7 @@ type TChangePasswordServiceParameters = {
   email: string;
   confirmHash: string;
   password: string;
-}
+};
 
 const handleChangePassword = async (data: TChangePasswordServiceParameters) => {
   const response = await api.post<TChangePasswordServiceParameters, null>(
@@ -86,5 +94,14 @@ const handleChangePassword = async (data: TChangePasswordServiceParameters) => {
     data
   );
   return response.data;
-}
+};
 export const changePasswordService = createService(handleChangePassword);
+
+/**
+ * ====================== Logout Service ======================
+ */
+const handleLogout = async () => {
+  await api.post(apiEndpoints.logout.path, {});
+};
+
+export const logoutService = createService(handleLogout);

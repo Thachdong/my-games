@@ -20,7 +20,7 @@ import {
   ChangePasswordPage,
 } from './auth/change-password';
 import { activateAction } from './auth/activate/activate.action';
-import { ProtectedRoute } from './protected-route';
+import { ProtectedLayout } from './protected-layout';
 
 export const router = createBrowserRouter([
   // AUTH ROUTES
@@ -61,7 +61,7 @@ export const router = createBrowserRouter([
   {
     id: 'protected',
     path: '/',
-    Component: ProtectedRoute,
+    Component: ProtectedLayout,
     children: [
       // HOME ROUTES
       {

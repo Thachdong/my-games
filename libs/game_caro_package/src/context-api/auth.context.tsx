@@ -1,6 +1,9 @@
 import { useLocalStorage } from 'game_caro_package/hocs/use-localstorage';
-import { TAuthenticatedUser } from 'game_caro_package/services/auth.service';
-import React, { createContext, useCallback } from 'react';
+import {
+  logoutService,
+  TAuthenticatedUser,
+} from 'game_caro_package/services/auth.service';
+import React, { createContext, useCallback, useState } from 'react';
 import { LOCAL_STORAGE_KEYS } from 'game_caro_package/libs/constants';
 import { Navigate } from 'react-router-dom';
 import { EPagePath } from 'game_caro_package/libs/constants';
@@ -9,34 +12,40 @@ export type TAuthContext = {
   user?: TAuthenticatedUser;
   login: (user: TAuthenticatedUser) => void;
   logout: () => void;
-  isAuthenticated: boolean;
 };
 
 const AuthContext = createContext<TAuthContext | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useLocalStorage<TAuthenticatedUser | undefined>(
-    LOCAL_STORAGE_KEYS.AUTHENTICATED_USER,
-    undefined
-  );
+  const [localUser, setLocalUser, removeUser] = useLocalStorage<
+    TAuthenticatedUser | undefined
+  >(LOCAL_STORAGE_KEYS.AUTHENTICATED_USER, undefined);
+
+  const [user, setUser] = useState<TAuthenticatedUser | undefined>(localUser);
 
   const login = useCallback(
     (user: TAuthenticatedUser) => {
       setUser(user);
 
+      setLocalUser(user);
+
       return <Navigate to={EPagePath.HOME} replace />;
     },
-    [setUser]
+    [setUser, setLocalUser]
   );
 
-  const logout = useCallback(() => {
-    setUser(undefined);
-  }, [setUser]);
+  const logout = useCallback(async () => {
+    removeUser();
 
-  const isAuthenticated = !!user;
+    setUser(undefined);
+
+    await logoutService({});
+
+    return <Navigate to={EPagePath.LOGIN} replace />;
+  }, [removeUser]);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated }}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

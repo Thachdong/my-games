@@ -125,7 +125,7 @@ class ApiService {
     });
 
     this.axiosInstance.interceptors.response.use(
-      (response) => response,
+      (response) => response.data,
       (error) => {
         if (error instanceof axios.AxiosError) {
           // Handle specific error codes

@@ -1,4 +1,4 @@
-import { loginService } from 'game_caro_package/services/auth.service';
+import { loginService, TAuthenticatedUser } from 'game_caro_package/services/auth.service';
 import {
   ELocalStorageKeys,
   setLocalStorageService,
@@ -22,7 +22,7 @@ import { ActionFunctionArgs } from 'react-router-dom';
  */
 export async function loginAction({
   request,
-}: ActionFunctionArgs): Promise<TActionResult<'OK'>> {
+}: ActionFunctionArgs): Promise<TActionResult<TAuthenticatedUser>> {
   const formData = await request.formData();
 
   const data: TLoginForm = {
@@ -56,6 +56,6 @@ export async function loginAction({
   }
 
   return {
-    data: 'OK',
+    data: authenticatedUser,
   };
 }
