@@ -6,7 +6,7 @@ import React from 'react';
 export const HomePage: React.FC = () => {
   return (
     <div
-      className="grid grid-cols-[275px,1fr,275px] gap-4 mt-8"
+      className="grid grid-cols-[275px,1fr,275px] gap-4 mt-8 pb-4"
       style={{
         height: 'calc(100vh - 64px - 32px)',
       }}

@@ -10,21 +10,23 @@ export const ProtectedLayout = () => {
   }
 
   return (
-    <div className='max-w-[1366px] mx-auto px-2'>
-      <div className="flex justify-between items-center py-2 px-12">
-        <img
-          src="./assets/images/logo-caro.png"
-          alt="game-caro"
-          className="w-12"
-        />
+    <div className="bg-[#dfdcd6]">
+      <div className="max-w-[1366px] mx-auto px-2">
+        <div className="flex justify-between items-center py-2 px-12">
+          <img
+            src="./assets/images/logo-caro.png"
+            alt="game-caro"
+            className="w-12"
+          />
 
-        <div>
-          <span>{user?.email}</span>
-          <span className="px-2">|</span>
-          <button onClick={logout}>Logout</button>
+          <div>
+            <span>{user?.email}</span>
+            <span className="px-2">|</span>
+            <button onClick={logout}>Logout</button>
+          </div>
         </div>
+        <Outlet />
       </div>
-      <Outlet />
     </div>
   );
 };

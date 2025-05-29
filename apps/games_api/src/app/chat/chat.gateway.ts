@@ -16,7 +16,7 @@ import { CreateMoveDto } from 'app/game/dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'app/user/user.service';
 
-@WebSocketGateway()
+@WebSocketGateway({ cors: true })
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {

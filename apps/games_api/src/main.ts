@@ -8,11 +8,18 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { EConfigKeys } from 'common/constants';
+import * as fs from 'fs';
+import * as path from 'path';
 
 const cookieParser = require('cookie-parser')
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const httpsOptions = {
+    key: fs.readFileSync(path.join(__dirname, '../ssl/server.key')),
+    cert: fs.readFileSync(path.join(__dirname, '../ssl/server.cert')),
+  };
+
+  const app = await NestFactory.create(AppModule, { httpsOptions });
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
 
