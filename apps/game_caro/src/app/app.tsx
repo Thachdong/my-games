@@ -1,12 +1,14 @@
 import { RouterProvider } from 'react-router-dom';
 import { router } from './routes/router';
-import { AuthProvider } from 'game_caro_package/context-api/auth.context';
+import { AuthProvider, ToastProvider } from 'game_caro_package/context-api';
 
 function App() {
   return (
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
+    <ToastProvider timeout={5000} position="bottom-left">
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </ToastProvider>
   );
 }
 

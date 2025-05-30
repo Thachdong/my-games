@@ -1,5 +1,10 @@
-import { Button, ErrorMessage, Input } from 'game_caro_package/components/atoms';
+import {
+  Button,
+  ErrorMessage,
+  Input,
+} from 'game_caro_package/components/atoms';
 import { InputPassword } from 'game_caro_package/components/atoms/form-tags/input-password';
+import { useToast } from 'game_caro_package/context-api';
 import { useCustomActionData } from 'game_caro_package/hooks';
 import { pagePaths } from 'game_caro_package/libs';
 import { useEffect } from 'react';
@@ -8,6 +13,7 @@ import { Form, useNavigate, Link } from 'react-router-dom';
 export const LoginPage = () => {
   const { validationErrors, serverError, data } = useCustomActionData<'OK'>();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (data === 'OK') {
@@ -56,10 +62,15 @@ export const LoginPage = () => {
       </p>
 
       <p className="text-center mt-2">
-        <Link to={pagePaths.forgotPassword} className="text-blue-500 hover:underline">
+        <Link
+          to={pagePaths.forgotPassword}
+          className="text-blue-500 hover:underline"
+        >
           Forgot your password?
         </Link>
       </p>
+
+      <button onClick={() => toast('test')}>toast</button>
     </div>
   );
 };
