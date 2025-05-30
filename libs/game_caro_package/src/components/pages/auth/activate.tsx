@@ -1,4 +1,4 @@
-import { Form, useNavigate } from 'react-router-dom';
+import { Form, Link, useNavigate } from 'react-router-dom';
 import { useCustomActionData } from 'game_caro_package/hooks';
 import { useEffect } from 'react';
 import { Button, ErrorMessage, Input } from 'game_caro_package/components/atoms';
@@ -45,15 +45,15 @@ export const ActivatePage = () => {
 
       <p className="text-center mt-4">
         Already activated?{' '}
-        <a href={pagePaths.login} className="text-blue-500 hover:underline">
+        <Link to={pagePaths.login} className="text-blue-500 hover:underline">
           Login here
-        </a>
+        </Link>
       </p>
-      
+
       <p className="text-center mt-2">
-        <a href={pagePaths.register} className="text-blue-500 hover:underline">
+        <Link to={pagePaths.register} className="text-blue-500 hover:underline">
           Register here
-        </a>
+        </Link>
       </p>
     </div>
   );

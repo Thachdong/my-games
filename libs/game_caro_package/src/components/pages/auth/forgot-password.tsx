@@ -44,9 +44,9 @@ export const ForgotPasswordPage = () => {
 
       <p className="text-center mt-4">
         Remembered your password?{' '}
-        <a href={pagePaths.login} className="text-blue-500 hover:underline">
+        <Link to={pagePaths.login} className="text-blue-500 hover:underline">
           Login here
-        </a>
+        </Link>
       </p>
 
       <p className="text-center mt-2">

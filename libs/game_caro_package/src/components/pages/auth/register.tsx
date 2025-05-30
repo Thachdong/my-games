@@ -3,7 +3,7 @@ import { InputPassword } from 'game_caro_package/components/atoms/form-tags/inpu
 import { useCustomActionData } from 'game_caro_package/hooks';
 import { pagePaths } from 'game_caro_package/libs';
 import { useEffect } from 'react';
-import { Form, useNavigate } from 'react-router-dom';
+import { Form, Link, useNavigate } from 'react-router-dom';
 
 export const RegisterPage = () => {
   const { validationErrors, serverError, data } = useCustomActionData<'OK'>();
@@ -50,15 +50,15 @@ export const RegisterPage = () => {
 
       <p className="text-center mt-4">
         Already have an account?{' '}
-        <a href={pagePaths.login} className="text-blue-500 hover:underline">
+        <Link to={pagePaths.login} className="text-blue-500 hover:underline">
           Login here
-        </a>
+        </Link>
       </p>
 
       <p className="text-center mt-2">
-        <a href={pagePaths.activate} className="text-blue-500 hover:underline">
+        <Link to={pagePaths.activate} className="text-blue-500 hover:underline">
           Activate your account
-        </a>
+        </Link>
       </p>
     </div>
   );
