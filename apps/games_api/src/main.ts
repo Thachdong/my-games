@@ -1,8 +1,3 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
-
 import { BadRequestException, Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
@@ -10,6 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { EConfigKeys } from 'common/constants';
 import * as fs from 'fs';
 import * as path from 'path';
+import { SocketIOAdapter } from 'socket-io-adapter';
 
 const cookieParser = require('cookie-parser')
 
@@ -22,6 +18,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { httpsOptions });
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
+
+  app.useWebSocketAdapter(new SocketIOAdapter(app));
 
   // Enable CORS
   app.enableCors();
