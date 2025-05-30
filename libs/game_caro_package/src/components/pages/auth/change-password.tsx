@@ -1,5 +1,6 @@
 import { Button, ErrorMessage, Input } from 'game_caro_package/components/atoms';
 import { InputPassword } from 'game_caro_package/components/atoms/form-tags/input-password';
+import { useToast } from 'game_caro_package/context-api';
 import { useCustomActionData } from 'game_caro_package/hooks';
 import { pagePaths } from 'game_caro_package/libs';
 import { useEffect } from 'react';
@@ -8,12 +9,14 @@ import { Form, Link, useNavigate } from 'react-router-dom';
 export const ChangePasswordPage = () => {
   const { validationErrors, serverError, data } = useCustomActionData<'OK'>();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (data === 'OK') {
+      toast("Password changed successfully, please log in again!")
       navigate(pagePaths.login);
     }
-  }, [data, navigate]);
+  }, [data, navigate, toast]);
 
   return (
     <div className="w-full max-w-md mx-auto">

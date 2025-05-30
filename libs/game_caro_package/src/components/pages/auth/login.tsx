@@ -4,22 +4,12 @@ import {
   Input,
 } from 'game_caro_package/components/atoms';
 import { InputPassword } from 'game_caro_package/components/atoms/form-tags/input-password';
-import { useToast } from 'game_caro_package/context-api';
 import { useCustomActionData } from 'game_caro_package/hooks';
 import { pagePaths } from 'game_caro_package/libs';
-import { useEffect } from 'react';
-import { Form, useNavigate, Link } from 'react-router-dom';
+import { Form, Link } from 'react-router-dom';
 
 export const LoginPage = () => {
-  const { validationErrors, serverError, data } = useCustomActionData<'OK'>();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (data === 'OK') {
-      navigate(pagePaths.home);
-    }
-  }, [data, navigate]);
+  const { validationErrors, serverError } = useCustomActionData<'OK'>();
 
   return (
     <div className="w-full max-w-md mx-auto">
@@ -37,6 +27,7 @@ export const LoginPage = () => {
           type="email"
           name="email"
           errors={validationErrors?.email}
+          autoFocus
         />
         <InputPassword
           label="Password"
@@ -69,8 +60,6 @@ export const LoginPage = () => {
           Forgot your password?
         </Link>
       </p>
-
-      <button onClick={() => toast('test')}>toast</button>
     </div>
   );
 };

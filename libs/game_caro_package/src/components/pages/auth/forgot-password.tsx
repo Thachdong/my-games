@@ -1,10 +1,28 @@
-import { Button, ErrorMessage, Input } from 'game_caro_package/components/atoms';
+import {
+  Button,
+  ErrorMessage,
+  Input,
+} from 'game_caro_package/components/atoms';
+import { useToast } from 'game_caro_package/context-api';
 import { useCustomActionData } from 'game_caro_package/hooks';
 import { pagePaths } from 'game_caro_package/libs';
-import { Form, Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Form, Link, useNavigate } from 'react-router-dom';
 
 export const ForgotPasswordPage = () => {
   const { validationErrors, serverError, data } = useCustomActionData<'OK'>();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (data === 'OK') {
+      toast(
+        'We have sent an activation code to your email. Please check your email and change your password!'
+      );
+
+      navigate(pagePaths.changePassword);
+    }
+  }, [navigate, toast, data]);
 
   return (
     <div className="w-full max-w-md mx-auto">

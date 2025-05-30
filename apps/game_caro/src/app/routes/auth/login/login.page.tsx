@@ -26,8 +26,10 @@ export function LoginPage() {
   useEffect(() => {
     if (userData) {
       login(userData);
+
+      navigate(pagePaths.home);
     }
-  }, [userData, login]);
+  }, [userData, login, navigate]);
 
   return <Page />;
 }

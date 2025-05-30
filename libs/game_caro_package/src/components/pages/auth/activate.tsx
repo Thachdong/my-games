@@ -3,16 +3,19 @@ import { useCustomActionData } from 'game_caro_package/hooks';
 import { useEffect } from 'react';
 import { Button, ErrorMessage, Input } from 'game_caro_package/components/atoms';
 import { pagePaths } from 'game_caro_package/libs';
+import { useToast } from 'game_caro_package/context-api';
 
 export const ActivatePage = () => {
   const { validationErrors, serverError, data } = useCustomActionData<'OK'>();
   const navigate = useNavigate();
+  const { toast } = useToast()
 
   useEffect(() => {
     if (data === 'OK') {
+      toast("Account activated successfully, please log in!")
       navigate(pagePaths.login);
     }
-  }, [data, navigate]);
+  }, [data, navigate, toast]);
 
   return (
     <div className="w-full max-w-md mx-auto">

@@ -7,6 +7,7 @@ import React, { createContext, useCallback, useState } from 'react';
 import { LOCAL_STORAGE_KEYS } from 'game_caro_package/libs/constants';
 import { Navigate } from 'react-router-dom';
 import { EPagePath } from 'game_caro_package/libs/constants';
+import { useToast } from './toast.context';
 
 export type TAuthContext = {
   user?: TAuthenticatedUser;
@@ -21,17 +22,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     TAuthenticatedUser | undefined
   >(LOCAL_STORAGE_KEYS.AUTHENTICATED_USER, undefined);
 
+  const { toast } = useToast();
+
   const [user, setUser] = useState<TAuthenticatedUser | undefined>(localUser);
 
   const login = useCallback(
     (user: TAuthenticatedUser) => {
+      console.log("login success", user)
       setUser(user);
 
       setLocalUser(user);
 
-      return <Navigate to={EPagePath.HOME} replace />;
+      toast("Login success!")
     },
-    [setUser, setLocalUser]
+    [setUser, setLocalUser, toast]
   );
 
   const logout = useCallback(async () => {
@@ -40,8 +44,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(undefined);
 
     await logoutService({});
-
-    return <Navigate to={EPagePath.LOGIN} replace />;
   }, [removeUser]);
 
   return (
