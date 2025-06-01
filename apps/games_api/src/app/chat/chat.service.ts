@@ -1,7 +1,7 @@
 import { IChatService } from 'app/chat/interfaces';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ChatMessage, ChatRoom } from 'app/chat/entities';
+import { Message, Room } from 'app/chat/entities';
 import { Repository } from 'typeorm';
 import {
   CreateChatRoomDto,
@@ -15,10 +15,10 @@ import { PAGE_SIZE } from 'common/constants';
 @Injectable()
 export class ChatService implements IChatService {
   constructor(
-    @InjectRepository(ChatRoom)
-    private readonly _roomRepository: Repository<ChatRoom>,
-    @InjectRepository(ChatMessage)
-    private readonly _messageRepository: Repository<ChatMessage>
+    @InjectRepository(Room)
+    private readonly _roomRepository: Repository<Room>,
+    @InjectRepository(Message)
+    private readonly _messageRepository: Repository<Message>
   ) {}
 
   async createChatRoom(data: CreateChatRoomDto): Promise<GetChatRoomDto> {

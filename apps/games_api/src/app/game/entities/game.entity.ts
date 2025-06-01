@@ -1,8 +1,8 @@
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
-import { User } from '../../user/entities/user.entity';
+import { User } from 'app/user/entities/user.entity';
 import { Move } from './move.entity';
-import { AbstractEntity } from '../../../common/abstract-entity'
-import { Tournament } from '../../tournament/entities/tournament.entity';
+import { AbstractEntity } from 'common/abstract-entity'
+import { Tournament } from 'app/tournament/entities/tournament.entity';
 
 @Entity('game')
 export class Game extends AbstractEntity {

@@ -71,6 +71,10 @@ export class ChatGateway
     const { roomId, message } = payload;
     const userId = client.data.user.id;
 
+    const user = await this._userService.getUserById(userId)
+
+    Logger.log(user)
+
     const result = await this._chatService.createMessage({
       roomId,
       userId,

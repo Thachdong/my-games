@@ -16,12 +16,12 @@ import { JwtStrategy } from './auth/passport-strategies/jwt.strategy';
 import { MailerModule } from 'app/mailer/mailer.module';
 import { EConfigKeys } from 'common/constants'
 import { ChatModule } from 'app/chat/chat.module';
+import { DatabaseModule } from 'app/database/database.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: "./env.game-api"
     }),
     TypeOrmModule.forRootAsync({
       useFactory: async () => ({
@@ -41,7 +41,8 @@ import { ChatModule } from 'app/chat/chat.module';
     UserModule,
     GameModule,
     TournamentModule,
-    ChatModule
+    ChatModule,
+    DatabaseModule
   ],
   providers: [
     {

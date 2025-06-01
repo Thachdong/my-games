@@ -2,7 +2,9 @@
   "name": "@my-games/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "typeorm": "typeorm-ts-node-esm"
+  },
   "private": true,
   "devDependencies": {
     "@angular-devkit/core": "^19.2.6",
@@ -67,6 +69,7 @@
     "ts-jest": "^29.1.0",
     "ts-node": "10.9.1",
     "tslib": "^2.3.0",
+    "typeorm-ts-node-esm": "^0.3.20",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.19.0",
     "vite": "^6.0.0",

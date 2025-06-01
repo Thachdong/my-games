@@ -1,4 +1,4 @@
-import { Logger, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailerModule as _MailerModule } from '@nestjs-modules/mailer';
 import { MailerService } from './mailer.service';
@@ -10,7 +10,6 @@ import { EConfigKeys } from 'common/constants';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        Logger.log("configService.get<string>(EConfigKeys.MAILER_HOST)" + configService.get<string>(EConfigKeys.MAILER_HOST));
         return {
           transport: {
             host: configService.get<string>(EConfigKeys.MAILER_HOST),
