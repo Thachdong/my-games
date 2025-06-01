@@ -15,6 +15,7 @@ import { GameService } from 'app/game/game.service';
 import { CreateMoveDto } from 'app/game/dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'app/user/user.service';
+import { Logger } from '@nestjs/common';
 
 @WebSocketGateway({ cors: true })
 export class ChatGateway
@@ -34,7 +35,7 @@ export class ChatGateway
    * ============================= life circle methods =================================
    */
   afterInit() {
-    console.log('WebSocket server initialized');
+    Logger.log('WebSocket server initialized');
   }
 
   handleConnection(client: Socket) {
@@ -48,15 +49,15 @@ export class ChatGateway
 
       const payload = this._jwtService.verify(token);
       client.data.user = payload;
-      console.log(`Client connected: ${client.id}, user: ${payload.email}`);
+      Logger.log(`Client connected: ${client.id}, user: ${payload.email}`);
     } catch (error) {
-      console.error('Error during WebSocket connection:', error);
+      Logger.error('Error during WebSocket connection:', error);
       client.disconnect();
     }
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`Client disconnected: ${client.id}`);
+    Logger.log(`Client disconnected: ${client.id}`);
   }
 
   /**

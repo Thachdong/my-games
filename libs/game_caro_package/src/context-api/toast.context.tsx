@@ -45,8 +45,6 @@ export const ToastProvider: React.FC<TToastProviderProps> = ({
     setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));
   }, []);
 
-  console.log('re-render toast');
-
   return (
     <ToastContext.Provider
       value={{ toast, closeToast, toasts, timeout, position }}

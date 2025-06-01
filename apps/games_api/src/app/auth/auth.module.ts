@@ -19,7 +19,9 @@ import { EConfigKeys } from 'common/constants';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>(EConfigKeys.JWT_SECRET),
+        secret: configService.get<string>(
+          EConfigKeys.JWT_SECRET
+        ),
         signOptions: {
           expiresIn: configService.get<string>(EConfigKeys.JWT_EXPIRES_IN),
         },
