@@ -26,7 +26,9 @@ export const createSocketClientService = (): Socket | void => {
   );
 
   if (!user || !user.accessToken) {
-    throw new Error('User is not authenticated or access token is missing');
+    console.log('User is not authenticated or access token is missing');
+
+    return;
   }
 
   const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || 'ws://localhost:3000';
@@ -149,7 +151,12 @@ const handleGetMessagesByRoomId = async (
     }
   );
 
-  return response.data;
+  console.log(response)
+
+  return {
+    data: response.data,
+    meta: response.meta,
+  };
 };
 
 export const getMessagesByRoomIdService = createService(

@@ -149,9 +149,9 @@ export class ChatService implements IChatService {
       page: page || 1,
       limit: take,
       total,
-      data: messages.map((message) => ({
+      data: messages.map(({ user, ...message}) => ({
         ...message,
-        sender: { ...message.user },
+        sender: { id: user.id, username: user.username },
       })),
     };
   }

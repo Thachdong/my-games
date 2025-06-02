@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
 
 export const apiEndpoints = {
   login: {
@@ -100,9 +100,9 @@ export const apiEndpoints = {
     getPatch: (id: string) => `/tournament-rank/${id}`,
   },
   getRoomMessages: {
-    path: '/rooms/:roomId/messages',
+    path: '/chat/rooms/:roomId/messages',
     method: 'GET',
-    getPath: (roomId: string) => `/rooms/${roomId}/messages`,
+    getPath: (roomId: string) => `/chat/rooms/${roomId}/messages`,
   }
 };
 

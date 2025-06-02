@@ -1,7 +1,7 @@
 import { useAuth } from 'game_caro_package/context-api';
 import { getMessagesByRoomIdService, TMessage } from 'game_caro_package/services';
 import moment from 'moment';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 type TChatContainerProps = {
@@ -16,22 +16,28 @@ export const ChatContainer: React.FC<TChatContainerProps> = ({
   const { user } = useAuth();
 
   const loader = useMemo(() => {
-    return <p>Loading more messages...</p>;
+    return <p className='text-sm text-gray-500 text-sm italic text-center'>Loading more messages...</p>;
   }, []);
 
   const fetchNextMessages = useCallback(async () => {
+    console.log(user);
+
     if (!user?.publicRoomId) {
       return;
     }
 
     const { data } = await getMessagesByRoomIdService(user.publicRoomId);
 
-    if (data) {
-      const { data: newMessages } = data;
+    console.log(data)
 
-      setMessages((prevMessages) => [...newMessages, ...prevMessages]);
+    if (data?.data) {
+      setMessages((prevMessages) => [...data.data, ...prevMessages]);
     }
-  }, [user?.publicRoomId, setMessages]);
+  }, [user, setMessages]);
+
+  useEffect(() => {
+    fetchNextMessages()
+  }, [fetchNextMessages])
 
   return (
     <div
