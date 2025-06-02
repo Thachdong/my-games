@@ -4,11 +4,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Socket } from 'socket.io-client';
 import {
   createSocketClientService,
+  ESubscribeEvents,
   sendMessageToRoomService,
+  TMessage,
 } from 'game_caro_package/services';
+import { ChatContainer } from 'game_caro_package/components/molecules';
 
 export const PublicChatRoom: React.FC = () => {
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<TMessage[]>([]);
   const [message, setMessage] = useState('');
   const socketRef = useRef<Socket | null>(null);
   const { user } = useAuth();
@@ -23,8 +26,8 @@ export const PublicChatRoom: React.FC = () => {
 
     socketRef.current = socket;
 
-    socket.on('message', (msg: string) => {
-      setMessages((prev) => [...prev, msg]);
+    socket.on(ESubscribeEvents.MESSAGE, (msg: TMessage) => {
+      setMessages((prev) => [...prev, { ...msg }]);
     });
 
     return () => {
@@ -50,13 +53,9 @@ export const PublicChatRoom: React.FC = () => {
       <p className="font-semibold mb-2 px-4 py-2 bg-blue-100 rounded">
         Public chat room
       </p>
-      <div className="mb-4 flex-1 overflow-y-auto bg-gray-50 rounded p-2">
-        {messages.map((msg, idx) => (
-          <div key={idx} className="mb-1">
-            {msg}
-          </div>
-        ))}
-      </div>
+
+      <ChatContainer messages={messages} setMessages={setMessages} />
+
       <form className="px-2" onSubmit={handleSubmit}>
         <Textarea
           name="message"

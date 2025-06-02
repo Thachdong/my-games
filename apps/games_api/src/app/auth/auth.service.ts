@@ -11,15 +11,15 @@ import { AuthenticatedUserDto } from './dto/authenticated-user.dto';
 import { GetUserDto } from '../user/dto/get-user.dto';
 import { IAuthService } from './interfaces/auth-service.interface';
 import { MailerService } from 'app/mailer/mailer.service';
-import { ChatService } from "app/chat/chat.service";
+import { ChatRoomType, Room } from 'app/chat/entities';
 
 @Injectable()
 export class AuthService implements IAuthService {
   constructor(
     @InjectRepository(User) private readonly _userRepository: Repository<User>,
+    @InjectRepository(Room) private readonly _romRepositoty: Repository<Room>,
     private readonly _jwtService: JwtService,
     private readonly _mailerService: MailerService,
-    private readonly _chatService: ChatService
   ) {}
 
   /**
@@ -136,11 +136,14 @@ export class AuthService implements IAuthService {
       startAt
     );
 
-    const publicRoomId = await this._chatService.getPublicRoomId();
+    const publicRoom = await this._romRepositoty.findOne({
+      where: { type: ChatRoomType.PUBLIC },
+      order: { createdAt: 'ASC' },
+    });
 
     return {
       accessToken,
-      publicRoomId,
+      publicRoomId: publicRoom?.id,
       ...user,
     };
   }
