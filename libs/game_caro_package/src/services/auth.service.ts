@@ -38,6 +38,7 @@ export type TAuthenticatedUser = {
   gameLost: number;
   gameDraw: number;
   accessToken: string;
+  publicRoomId: string;
 };
 
 const handleLogin = async (data: TLoginForm) => {

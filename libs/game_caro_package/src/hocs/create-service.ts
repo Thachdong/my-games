@@ -7,7 +7,7 @@ type TServiceResponse<T> = {
   };
 };
 
-export const createService = <TParams, TReturn>(
+export const createService = <TParams = unknown, TReturn = unknown>(
   handler: (params: TParams) => Promise<TReturn>
 ) => {
   return async (params: TParams): Promise<TServiceResponse<TReturn>> => {

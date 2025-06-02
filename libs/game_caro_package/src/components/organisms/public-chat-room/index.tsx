@@ -1,9 +1,11 @@
 import { Button, Textarea } from 'game_caro_package/components/atoms';
 import { useAuth } from 'game_caro_package/context-api';
 import React, { useEffect, useRef, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
-
-const SOCKET_URL = 'ws://localhost:3000';
+import { Socket } from 'socket.io-client';
+import {
+  createSocketClientService,
+  sendMessageToRoomService,
+} from 'game_caro_package/services';
 
 export const PublicChatRoom: React.FC = () => {
   const [messages, setMessages] = useState<string[]>([]);
@@ -12,13 +14,12 @@ export const PublicChatRoom: React.FC = () => {
   const { user } = useAuth();
 
   useEffect(() => {
-    const socket = io(SOCKET_URL, {
-      auth: {
-        token: `Bearer ${user?.accessToken}`
-      }
-    });
+    const socket = createSocketClientService();
 
-    socket.connect()
+    if (!socket) {
+      console.error('Socket connection failed');
+      return;
+    }
 
     socketRef.current = socket;
 
@@ -33,11 +34,15 @@ export const PublicChatRoom: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (message.trim()) {
-      console.log('emit message', message);
-      socketRef.current?.emit('message', message);
-      setMessage('');
+
+    if (!message.trim() || !user?.publicRoomId || !socketRef.current) {
+      console.error('Message, room ID, or socket client is missing');
+      return;
     }
+
+    sendMessageToRoomService(socketRef.current, user?.publicRoomId, message);
+
+    setMessage('');
   };
 
   return (

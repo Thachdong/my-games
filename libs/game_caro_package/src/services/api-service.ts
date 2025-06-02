@@ -99,6 +99,11 @@ export const apiEndpoints = {
     method: 'PATCH',
     getPatch: (id: string) => `/tournament-rank/${id}`,
   },
+  getRoomMessages: {
+    path: '/rooms/:roomId/messages',
+    method: 'GET',
+    getPath: (roomId: string) => `/rooms/${roomId}/messages`,
+  }
 };
 
 class ApiService {
