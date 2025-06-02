@@ -11,7 +11,7 @@ import { AuthenticatedUserDto } from './dto/authenticated-user.dto';
 import { GetUserDto } from '../user/dto/get-user.dto';
 import { IAuthService } from './interfaces/auth-service.interface';
 import { MailerService } from 'app/mailer/mailer.service';
-import { ConfigService } from '@nestjs/config';
+import { ChatService } from "app/chat/chat.service";
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -19,7 +19,7 @@ export class AuthService implements IAuthService {
     @InjectRepository(User) private readonly _userRepository: Repository<User>,
     private readonly _jwtService: JwtService,
     private readonly _mailerService: MailerService,
-    private readonly _configService: ConfigService
+    private readonly _chatService: ChatService
   ) {}
 
   /**
@@ -136,8 +136,11 @@ export class AuthService implements IAuthService {
       startAt
     );
 
+    const publicRoomId = await this._chatService.getPublicRoomId();
+
     return {
       accessToken,
+      publicRoomId,
       ...user,
     };
   }

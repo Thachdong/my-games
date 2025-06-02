@@ -74,4 +74,13 @@ export interface IChatService {
    * @throws {ConflictException} - If the chat room name already exists
    */
   updateChatRoomName: (roomId: string, name: string) => Promise<GetChatRoomDto>;
+
+  /**
+   * Description: Get public roomId
+   * @implements
+   * - Get public roomId
+   * - if not exists, create a new public room and return its ID
+   * @returns Promise<string> - The ID of the public chat room
+   */
+  getPublicRoomId(): Promise<string>;
 }

@@ -1,7 +1,8 @@
-import { Column, Entity, ManyToMany } from 'typeorm';
+import { Column, Entity, ManyToMany, OneToMany } from 'typeorm';
 import { Exclude } from 'class-transformer';
-import { Game } from '../../game/entities/game.entity';
-import { AbstractEntity } from "../../../common/abstract-entity"
+import { Game } from 'app/game/entities';
+import { AbstractEntity } from "common/abstract-entity"
+import { Message } from 'app/chat/entities';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -52,4 +53,7 @@ export class User extends AbstractEntity {
 
   @ManyToMany(() => Game, (game) => game.players)
   games: Game[];
+
+  @OneToMany(() => Message, (message) => message.user)
+  messages: Message[];
 }

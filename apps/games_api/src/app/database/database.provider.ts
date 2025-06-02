@@ -2,11 +2,6 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { EProvide } from 'common/constants';
 import { EConfigKeys } from 'common/constants';
-import { Message, Room } from 'app/chat/entities';
-import { Game, Move } from 'app/game/entities';
-import { User } from 'app/user/entities/user.entity';
-import { Tournament, TournamentRank } from 'app/tournament/entities';
-import { Logger } from '@nestjs/common';
 
 export const databaseProvider = [
   {
@@ -19,19 +14,9 @@ export const databaseProvider = [
         username: configService.get(EConfigKeys.DB_USERNAME, 'dongt'),
         password: configService.get(EConfigKeys.DB_PASSWORD, 'dongt'),
         database: configService.get(EConfigKeys.DB_DATABASE, 'gomoku_v1'),
-        entities: [
-          Message,
-          Room,
-          User,
-          Game,
-          Move,
-          Tournament,
-          TournamentRank,
-        ],
+        entities: [__dirname + '/**/*.entity.{ts,js}'],
         synchronize: true,
       };
-
-      Logger.log('Entities: =================================', options.entities);
 
       const dataSource = new DataSource(options);
 

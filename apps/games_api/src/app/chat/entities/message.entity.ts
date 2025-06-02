@@ -5,20 +5,20 @@ import { AbstractEntity } from "common/abstract-entity";
 
 @Entity('message')
 export class Message extends AbstractEntity {
-  @Column()
+  @Column({ type: 'uuid' })
   roomId: string;
 
   @ManyToOne(() => Room, (room) => room.messages)
   @JoinColumn()
   room: Room;
 
-  @Column()
+  @Column({ type: 'uuid' })
   userId: string;
 
   @ManyToOne(() => User)
-  @JoinColumn({ name: 'userId' })
+  @JoinColumn()
   user: User;
 
-  @Column()
+  @Column('text')
   content: string;
 }

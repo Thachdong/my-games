@@ -17,6 +17,7 @@ import { MailerModule } from 'app/mailer/mailer.module';
 import { EConfigKeys } from 'common/constants'
 import { ChatModule } from 'app/chat/chat.module';
 import { DatabaseModule } from 'app/database/database.module';
+import { Room, Message } from 'app/chat/entities';
 
 @Module({
   imports: [
@@ -31,7 +32,7 @@ import { DatabaseModule } from 'app/database/database.module';
         username: process.env[EConfigKeys.DB_USERNAME] || 'dongt',
         password: process.env[EConfigKeys.DB_PASSWORD] || 'dongt',
         database: process.env[EConfigKeys.DB_DATABASE] || 'gomoku_v1',
-        entities: [User, Tournament, TournamentRank, Move, Game],
+        entities: [User, Tournament, TournamentRank, Move, Game, Room, Message],
         synchronize: true,
       }),
     }),
