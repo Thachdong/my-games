@@ -24,3 +24,5 @@ export enum EPagePath {
 export const LOCAL_STORAGE_KEYS = {
   AUTHENTICATED_USER: 'authenticatedUser',
 }
+
+export const DEFAULT_PAGE_SIZE = 25; // default number of items per page

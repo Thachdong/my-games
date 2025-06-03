@@ -28,7 +28,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = useCallback(
     (user: TAuthenticatedUser) => {
-      console.log("login success", user)
       setUser(user);
 
       setLocalUser(user);

@@ -64,11 +64,11 @@ export const apiEndpoints = {
   },
   createTournament: {
     path: '/tournament',
-    method: 'POST'
+    method: 'POST',
   },
   getAllTournament: {
     path: '/tournament',
-    method: 'GET'
+    method: 'GET',
   },
   getTournamentById: {
     path: '/tournament/:id',
@@ -103,7 +103,7 @@ export const apiEndpoints = {
     path: '/chat/rooms/:roomId/messages',
     method: 'GET',
     getPath: (roomId: string) => `/chat/rooms/${roomId}/messages`,
-  }
+  },
 };
 
 class ApiService {

@@ -46,12 +46,11 @@ const handleLogin = async (data: TLoginForm) => {
     apiEndpoints.login.path,
     data
   );
+
   return response.data;
 };
 
-export const loginService = createService<TLoginForm, TAuthenticatedUser>(
-  handleLogin
-);
+export const loginService = createService(handleLogin);
 
 /**
  * ====================== Activate Service ======================
@@ -64,9 +63,7 @@ const handleActivate = async (data: TActivateForm) => {
   return response.data;
 };
 
-export const activateService = createService<TActivateForm, null>(
-  handleActivate
-);
+export const activateService = createService<null>(handleActivate);
 
 /**
  * ====================== Forgot Password Service ======================

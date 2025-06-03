@@ -143,7 +143,7 @@ const handleGetMessagesByRoomId = async (
   page?: number,
   limit?: number
 ) => {
-  const response = await api.get<TPaginateParameters, TPagination<TMessage>>(
+  const { data } = await api.get<TPaginateParameters, TPagination<TMessage>>(
     apiEndpoints.getRoomMessages.getPath(roomId),
     {
       page,
@@ -151,11 +151,9 @@ const handleGetMessagesByRoomId = async (
     }
   );
 
-  console.log(response)
-
   return {
-    data: response.data,
-    meta: response.meta,
+    data: data.data,
+    meta: data.meta,
   };
 };
 
