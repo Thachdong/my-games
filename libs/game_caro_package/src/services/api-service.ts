@@ -106,6 +106,14 @@ export const apiEndpoints = {
   },
 };
 
+export type TExtraAxiosResponse<T> = AxiosResponse<T> & {
+  meta?: {
+    page: number;
+    limit: number;
+    total: number;
+  };
+};
+
 class ApiService {
   private static instance: ApiService;
   private axiosInstance: AxiosInstance;
@@ -163,7 +171,9 @@ class ApiService {
   }
 
   public get<T, K>(url: string, params?: T) {
-    return this.axiosInstance.get<K>(url, { params });
+    return this.axiosInstance
+      .get<K>(url, { params })
+      .then((res) => res as TExtraAxiosResponse<K>);
   }
 
   public post<T, K>(url: string, data: T) {

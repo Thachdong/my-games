@@ -28,11 +28,11 @@ export async function forgotPasswordAction({
   }
 
   // Call forgot password service
-  const { error } = await forgotPasswordService(validatedData.email);
+  const result = await forgotPasswordService(validatedData.email);
 
-  if (error) {
+  if (result && 'error' in result) {
     return {
-      serverError: typeof error === 'string' ? error : error.messages,
+      serverError: result.error
     };
   }
 

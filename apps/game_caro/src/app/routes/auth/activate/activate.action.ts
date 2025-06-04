@@ -25,11 +25,11 @@ export async function activateAction({
     };
   }
 
-  const { error } = await activateService(data);
+  const result = await activateService(data);
 
-  if (error) {
+  if (result && 'error' in result) {
     return {
-      serverError: typeof error === 'string' ? error : error.messages,
+      serverError: result.error,
     };
   }
 

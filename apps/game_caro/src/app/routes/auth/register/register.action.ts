@@ -14,7 +14,7 @@ import { TActionResult } from 'game_caro_package/types';
  * - Validate the data using Zod schema
  * - Call the registration service
  * - Return appropriate action result
- * @returns 
+ * @returns
  */
 export async function registerAction({
   request,
@@ -35,11 +35,11 @@ export async function registerAction({
     };
   }
 
-  const { error } = await registerService(data);
+  const result = await registerService(data);
 
-  if (error) {
+  if (result && 'error' in result) {
     return {
-      serverError: typeof error === 'string' ? error : error.messages
+      serverError: result.error,
     };
   }
 

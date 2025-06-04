@@ -32,15 +32,15 @@ export async function changePasswordAction({
   }
 
   // Call the change password service
-  const { error } = await changePasswordService({
+  const result = await changePasswordService({
     confirmHash: validatedData.confirmHash,
     email: validatedData.email,
     password: validatedData.password,
   });
 
-  if (error) {
+  if (result && 'error' in result) {
     return {
-      serverError: typeof error === 'string' ? error : error.messages,
+      serverError: result.error
     };
   }
 

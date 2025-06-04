@@ -8,19 +8,20 @@ import moment from 'moment';
 import { useCallback, useEffect, useMemo } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
-type TChatContainerProps = {
-  messages: TMessage[];
-  setMessages: React.Dispatch<React.SetStateAction<TMessage[]>>;
-};
-
-export const ChatContainer: React.FC<TChatContainerProps> = ({
-  messages,
-  setMessages,
-}) => {
+export const ChatContainer: React.FC = () => {
   const { user } = useAuth();
   const { fetchItems, items } = usePagination<TMessage>();
 
-  console.log(items, 'items');
+  const messages = useMemo(() => {
+    return items.reduce((result: TMessage[], msg: TMessage) => {
+      const index = result.findIndex((i) => i.id === msg.id);
+
+      if (index === -1) {
+        result.push(msg);
+      }
+      return result;
+    }, []);
+  }, [items]);
 
   const loader = useMemo(() => {
     return (
@@ -30,33 +31,28 @@ export const ChatContainer: React.FC<TChatContainerProps> = ({
     );
   }, []);
 
-  const fetchNextMessages = useCallback(async () => {
+  const fetchNextMessages = useCallback(() => {
+    console.log('fetchNextMessages');
+  }, []);
+
+  const handleGMessage = useCallback(async () => {
     if (!user?.publicRoomId) {
-      return;
+      return null;
     }
 
-    const { data } = await getMessagesByRoomIdService(user.publicRoomId);
+    const result = await getMessagesByRoomIdService({
+      roomId: user.publicRoomId,
+    });
 
-    if (data?.data) {
-      setMessages((prevMessages) => [...data.data, ...prevMessages]);
-    }
-  }, [user, setMessages]);
-
-  useEffect(() => {
-    fetchNextMessages();
-  }, [fetchNextMessages]);
-
-  const handleGMessage = useCallback(async() => {
-    if (!user?.publicRoomId) {
-      return;
+    if ('data' in result && result.meta) {
+      return {
+        data: result.data,
+        meta: result.meta,
+      };
     }
 
-    const { data } = await getMessagesByRoomIdService(user.publicRoomId, 1);
-
-    if (data) {
-      return { ...data }
-    }
-  }, [user?.publicRoomId])
+    return null;
+  }, [user?.publicRoomId]);
 
   useEffect(() => {
     fetchItems(handleGMessage);
@@ -65,10 +61,10 @@ export const ChatContainer: React.FC<TChatContainerProps> = ({
   return (
     <div
       id="scrollable-messages-container"
-      className="flex flex-col-reverse overflow-y-auto h-full"
+      className="flex flex-col-reverse overflow-y-auto h-full px-2"
     >
       <InfiniteScroll
-        dataLength={messages.length}
+        dataLength={items.length}
         hasMore={true}
         loader={loader}
         next={fetchNextMessages}
@@ -76,11 +72,17 @@ export const ChatContainer: React.FC<TChatContainerProps> = ({
       >
         {messages.map((message) => (
           <div key={message.id} className="mb-1">
-            <span className="font-semibold">{message.sender.username}:</span>{' '}
-            {message.content}
-            <span className="text-gray-500 text-sm ml-2">
+            <p>
+              <span className="font-semibold text-sm">
+                {message.sender.username}:{' '}
+              </span>
+
+              {message.content}
+            </p>
+
+            <p className="text-gray-500 text-xs text-right ml-2">
               {moment(message.createdAt).format('DD-MM-YYYY HH:mm:ss')}
-            </span>
+            </p>
           </div>
         ))}
       </InfiniteScroll>

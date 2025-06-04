@@ -54,7 +54,7 @@ export const PublicChatRoom: React.FC = () => {
         Public chat room
       </p>
 
-      <ChatContainer messages={messages} setMessages={setMessages} />
+      <ChatContainer />
 
       <form className="px-2" onSubmit={handleSubmit}>
         <Textarea
@@ -62,7 +62,7 @@ export const PublicChatRoom: React.FC = () => {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
-        <Button type="submit">Send</Button>
+        <Button className='h-8' type="submit">Send</Button>
       </form>
     </div>
   );

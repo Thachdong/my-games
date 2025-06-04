@@ -138,12 +138,18 @@ export type TMessage = {
   createdAt: string;
 };
 
-const handleGetMessagesByRoomId = async (
-  roomId: string,
-  page?: number,
-  limit?: number
-) => {
-  const { data } = await api.get<TPaginateParameters, TPagination<TMessage>>(
+type TGetMessageParams = {
+  roomId: string;
+  page?: number;
+  limit?: number;
+};
+
+const handleGetMessagesByRoomId = async ({
+  roomId,
+  page,
+  limit,
+}: TGetMessageParams) => {
+  const result = await api.get<TPaginateParameters, TMessage[]>(
     apiEndpoints.getRoomMessages.getPath(roomId),
     {
       page,
@@ -152,8 +158,8 @@ const handleGetMessagesByRoomId = async (
   );
 
   return {
-    data: data.data,
-    meta: data.meta,
+    data: result.data,
+    meta: result.meta,
   };
 };
 

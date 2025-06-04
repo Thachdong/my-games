@@ -1,4 +1,7 @@
-import { loginService, TAuthenticatedUser } from 'game_caro_package/services/auth.service';
+import {
+  loginService,
+  TAuthenticatedUser,
+} from 'game_caro_package/services/auth.service';
 import {
   ELocalStorageKeys,
   setLocalStorageService,
@@ -40,22 +43,19 @@ export async function loginAction({
   }
 
   // Call the login service
-  const { error, data: authenticatedUser } = await loginService(data);
+  const result = await loginService(data);
 
-  if (error) {
+  if ('error' in result) {
     return {
-      serverError: typeof error === 'string' ? error : error.messages,
+      serverError: result.error,
     };
   }
 
-  if (authenticatedUser) {
-    setLocalStorageService(
-      ELocalStorageKeys.AUTHENTICATED_USER,
-      authenticatedUser
-    );
+  if ('data' in result) {
+    setLocalStorageService(ELocalStorageKeys.AUTHENTICATED_USER, result.data);
   }
 
   return {
-    data: authenticatedUser,
+    data: result,
   };
 }

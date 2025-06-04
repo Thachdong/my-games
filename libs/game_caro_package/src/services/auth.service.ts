@@ -63,7 +63,7 @@ const handleActivate = async (data: TActivateForm) => {
   return response.data;
 };
 
-export const activateService = createService<null>(handleActivate);
+export const activateService = createService(handleActivate);
 
 /**
  * ====================== Forgot Password Service ======================
