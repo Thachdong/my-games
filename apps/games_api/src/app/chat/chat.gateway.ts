@@ -1,4 +1,4 @@
-import { GameMoveBodyDto, MessageBodyDto } from 'app/chat/dto';
+import { GameMoveBodyDto, JoinChatRoomDto, MessageBodyDto } from 'app/chat/dto';
 import {
   ConnectedSocket,
   MessageBody,
@@ -19,6 +19,7 @@ import { Logger } from '@nestjs/common';
 import { TournamentService } from 'app/tournament/tournament.service';
 
 export enum ESubscribeEvents {
+  JOIN_ROOM = 'joinRoom',
   MESSAGE = 'message',
   GAME_MOVE = 'gameMove',
   USER_JOINED_GAME = 'userJoinedGame',
@@ -71,7 +72,7 @@ export class ChatGateway
   }
 
   /**
-   * ============================= socket events =================================
+   * ============================= Event: Message =================================
    */
   @SubscribeMessage(ESubscribeEvents.MESSAGE)
   async handleMessage(
@@ -87,9 +88,25 @@ export class ChatGateway
       content: message,
     });
 
-    client.to(roomId).emit(ESubscribeEvents.MESSAGE, result);
+    this._server.to(roomId).emit(ESubscribeEvents.MESSAGE, result);
   }
 
+  /**
+   * ============================= Event: GAME_MOVE =================================
+   */
+  @SubscribeMessage(ESubscribeEvents.JOIN_ROOM)
+  async handleJoinChatRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: JoinChatRoomDto
+  ) {
+    const { roomId } = payload;
+
+    client.join(roomId);
+  }
+
+  /**
+   * ============================= Event: GAME_MOVE =================================
+   */
   @SubscribeMessage(ESubscribeEvents.GAME_MOVE)
   async handleGameAction(
     @ConnectedSocket() client: Socket,
@@ -108,9 +125,12 @@ export class ChatGateway
 
     const createdMove = await this._gameService.addMove(moveData);
 
-    client.to(gameId).emit(ESubscribeEvents.GAME_MOVE, createdMove);
+    this._server.to(gameId).emit(ESubscribeEvents.GAME_MOVE, createdMove);
   }
 
+  /**
+   * ============================= Event: USER_JOINED_GAME =================================
+   */
   @SubscribeMessage(ESubscribeEvents.USER_JOINED_GAME)
   async handleJoinRoom(
     @ConnectedSocket() client: Socket,
@@ -120,14 +140,17 @@ export class ChatGateway
     const user = await this._userService.getUserById(userId);
 
     if (user) {
-      await this._gameService.joinGame (gameId, user);
+      await this._gameService.joinGame(gameId, user);
 
-      client.to(gameId).emit(ESubscribeEvents.USER_JOINED_GAME, {
+      this._server.to(gameId).emit(ESubscribeEvents.USER_JOINED_GAME, {
         userId: user.id,
       });
     }
   }
 
+  /**
+   * ============================= Event: USER_JOINED_TOURNAMENT =================================
+   */
   @SubscribeMessage(ESubscribeEvents.USER_JOINED_TOURNAMENT)
   async handleLeaveRoom(
     @ConnectedSocket() client: Socket,
@@ -138,12 +161,15 @@ export class ChatGateway
     if (userId) {
       await this._tournamentService.playerJoin(tournamentId, userId);
 
-      client.to(tournamentId).emit(ESubscribeEvents.USER_JOINED_TOURNAMENT, {
+      this._server.to(tournamentId).emit(ESubscribeEvents.USER_JOINED_TOURNAMENT, {
         userId,
       });
     }
   }
 
+  /**
+   * ============================= Event: USER_LEFT_TOURNAMENT =================================
+   */
   @SubscribeMessage(ESubscribeEvents.USER_LEFT_TOURNAMENT)
   async handleRoom(
     @ConnectedSocket() client: Socket,
@@ -154,7 +180,7 @@ export class ChatGateway
     if (userId) {
       await this._tournamentService.playerLeave(tournamentId, userId);
 
-      client.to(tournamentId).emit(ESubscribeEvents.USER_LEFT_TOURNAMENT, {
+      this._server.to(tournamentId).emit(ESubscribeEvents.USER_LEFT_TOURNAMENT, {
         userId,
       });
     }

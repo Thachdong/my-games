@@ -1,7 +1,7 @@
 import { apiEndpoints } from 'game_caro_package/services/api-service';
 import api from 'game_caro_package/services/api-service';
 import { createService } from 'game_caro_package/hocs/create-service';
-import { TPaginateParameters, TPagination } from 'game_caro_package/types';
+import { TPaginateParameters } from 'game_caro_package/types';
 import { io, Socket } from 'socket.io-client';
 import {
   ELocalStorageKeys,
@@ -10,6 +10,7 @@ import {
 } from '.';
 
 export enum ESubscribeEvents {
+  JOIN_ROOM = 'joinRoom',
   MESSAGE = 'message',
   GAME_MOVE = 'gameMove',
   USER_JOINED_GAME = 'userJoinedGame',
