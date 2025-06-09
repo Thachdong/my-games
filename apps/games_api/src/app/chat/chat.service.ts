@@ -134,6 +134,7 @@ export class ChatService implements IChatService {
     const [messages, total] = await this._messageRepository.findAndCount({
       where: { roomId },
       relations: ['user'],
+      order: { createdAt: 'DESC' },
       take,
       skip,
     });

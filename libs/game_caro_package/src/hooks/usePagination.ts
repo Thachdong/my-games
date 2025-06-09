@@ -5,6 +5,9 @@ export const usePagination = <T>() => {
   const [items, setItems] = React.useState<T[]>([]);
   const [meta, setMeta] = React.useState<TPagination<T>['meta']>();
   const [loading, setLoading] = React.useState(false);
+  const [hasMore, setHasMore] = React.useState(true);
+
+  // console.log("hook loading ...", loading)
 
   const fetchItems = useCallback(
     async (fetchFunction: () => Promise<TPagination<T> | null>) => {
@@ -22,6 +25,10 @@ export const usePagination = <T>() => {
         setItems((prev) => [...prev, ...data]);
 
         setMeta({ ...meta });
+
+        if (meta.total / meta.limit <= meta.page) {
+          setHasMore(false);
+        }
       } catch (error) {
         console.error('Error fetching items:', error);
       } finally {
@@ -31,5 +38,5 @@ export const usePagination = <T>() => {
     []
   );
 
-  return { items, fetchItems, meta, loading };
+  return { items, fetchItems, meta, loading, setItems, hasMore };
 };

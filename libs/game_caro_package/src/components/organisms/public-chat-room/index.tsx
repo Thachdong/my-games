@@ -34,10 +34,22 @@ export const PublicChatRoom: React.FC = () => {
     [message, socket, setMessage, user?.publicRoomId]
   );
 
+  const onChatEnter = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (message.trim()) {
+          handleSubmit(e as React.FormEvent);
+        }
+      }
+    },
+    [message, handleSubmit]
+  );
+
   useEffect(() => {
     return () => {
       if (socket) {
-        socket.disconnect();
+        socket.close();
       }
     };
   }, [socket]);
@@ -55,6 +67,8 @@ export const PublicChatRoom: React.FC = () => {
           name="message"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={onChatEnter}
+          autoFocus
         />
         <Button className="h-8" type="submit">
           Send
