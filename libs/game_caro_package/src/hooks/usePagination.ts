@@ -1,34 +1,24 @@
 import { TPagination } from 'game_caro_package/types';
-import React, { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 export const usePagination = <T>() => {
-  const [items, setItems] = React.useState<T[]>([]);
-  const [meta, setMeta] = React.useState<TPagination<T>['meta']>();
-  const [loading, setLoading] = React.useState(false);
-  const [hasMore, setHasMore] = React.useState(true);
-
-  // console.log("hook loading ...", loading)
+  const [items, setItems] = useState<T[]>([]);
+  const [meta, setMeta] = useState<TPagination<T>['meta']>();
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
   const fetchItems = useCallback(
     async (fetchFunction: () => Promise<TPagination<T> | null>) => {
       setLoading(true);
-
       try {
         const result = await fetchFunction();
+        if (!result) throw new Error('Error occurred while fetching items');
 
-        if (!result) {
-          throw new Error('Error occurred while fetching items');
-        }
+        setItems(prev => [...prev, ...result.data]);
+        setMeta(result.meta);
 
-        const { data, meta } = result;
-
-        setItems((prev) => [...prev, ...data]);
-
-        setMeta({ ...meta });
-
-        if (meta.total / meta.limit <= meta.page) {
-          setHasMore(false);
-        }
+        const { total, limit, page } = result.meta;
+        setHasMore(page * limit < total);
       } catch (error) {
         console.error('Error fetching items:', error);
       } finally {

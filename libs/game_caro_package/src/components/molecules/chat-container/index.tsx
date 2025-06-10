@@ -11,10 +11,9 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 
 export const ChatContainer: React.FC = () => {
   const { user } = useAuth();
-  const { fetchItems, items, setItems, meta, hasMore, loading } =
+  const { fetchItems, items, setItems, meta, hasMore } =
     usePagination<TMessage>();
   const [socket] = useSocket();
-  console.log("container loading outer ...", loading)
 
   const messages = useMemo(() => {
     return items.reduce((result: TMessage[], msg: TMessage) => {
@@ -27,17 +26,8 @@ export const ChatContainer: React.FC = () => {
     }, []);
   }, [items]);
 
-  const loader = useMemo(() => {
-    return (
-      <p className="text-sm text-gray-500 text-sm italic text-center">
-        Loading more messages...
-      </p>
-    );
-  }, []);
-
   const handleGetMessage = useCallback(
     async (page: number) => {
-      // console.log(loading)
       if (!user?.publicRoomId) {
         return null;
       }
@@ -60,15 +50,21 @@ export const ChatContainer: React.FC = () => {
   );
 
   const fetchNextMessages = useCallback(() => {
-    if (meta?.page && hasMore) {
-      fetchItems(() => handleGetMessage(meta.page + 1));
-    }
-  }, [meta, handleGetMessage, hasMore, fetchItems]);
+    if (!meta) return;
 
+    fetchItems(() => handleGetMessage(meta?.page + 1));
+  }, [meta, handleGetMessage, fetchItems]);
+
+  /**
+   * Fetch first page
+   */
   useEffect(() => {
-    fetchItems(() => handleGetMessage(1)); // fetch first page
+    fetchItems(() => handleGetMessage(1));
   }, [handleGetMessage, fetchItems]);
 
+  /**
+   * Join room and start listen message
+   */
   useEffect(() => {
     if (socket && !socket.connected) {
       socket.connect();
@@ -89,18 +85,6 @@ export const ChatContainer: React.FC = () => {
     };
   }, [socket, user?.publicRoomId, setItems]);
 
-  useEffect(() => {
-    const latestMessage = items[0];
-
-    if (meta?.page === 1 || latestMessage?.sender?.id === user?.id) {
-      const lastItem = document.getElementById(latestMessage.id)
-
-      if (lastItem) {
-        lastItem.scrollIntoView()
-      }
-    }
-  }, [meta?.page, items, user?.id]);
-
   return (
     <div
       id="scrollable-messages-container"
@@ -120,22 +104,29 @@ export const ChatContainer: React.FC = () => {
       <InfiniteScroll
         dataLength={items.length}
         hasMore={hasMore}
-        loader={loader}
+        loader={
+          <p className="text-sm text-gray-500 text-sm italic text-center">
+            Loading more messages...
+          </p>
+        }
         next={fetchNextMessages}
         scrollableTarget="scrollable-messages-container"
         className="flex flex-col-reverse w-full"
+        inverse={true}
+        height={'calc(100vh - 64px - 32px - 40px - 88px - 48px)'}
+        initialScrollY={Number.MAX_SAFE_INTEGER}
       >
         {messages.map((message) => (
           <div key={message.id} id={message.id} className="w-full mb-1">
-        <p>
-          <span className="font-semibold text-sm">
-            {message.sender.username}:{' '}
-          </span>
-          {message.content}
-        </p>
-        <p className="text-gray-500 text-xs text-right ml-2">
-          {moment(message.createdAt).format('DD-MM-YYYY HH:mm:ss')}
-        </p>
+            <p>
+              <span className="font-semibold text-sm">
+                {message.sender.username}:{' '}
+              </span>
+              {message.content}
+            </p>
+            <p className="text-gray-500 text-xs text-right ml-2">
+              {moment(message.createdAt).format('DD-MM-YYYY HH:mm:ss')}
+            </p>
           </div>
         ))}
       </InfiniteScroll>
