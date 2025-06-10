@@ -50,7 +50,7 @@ export const Input: React.FC<TInputProps> = ({
         </span>
       )}
 
-      { prependIcon }
+      {prependIcon}
 
       <input
         id={name}
@@ -67,7 +67,7 @@ export const Input: React.FC<TInputProps> = ({
         {...props}
       />
 
-      { appendIcon }
+      {appendIcon}
 
       <ErrorMessage errors={errors || []} id={`${name}-error`} />
 

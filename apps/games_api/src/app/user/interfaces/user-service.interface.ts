@@ -17,7 +17,7 @@ export interface IUserService {
 
   /**
    * Description: Get user by ID
-   * @param id 
+   * @param id
    * @returns Promise<GetUserDto | void>
    * Exceptions:
    * - NOT_FOUND
@@ -26,8 +26,8 @@ export interface IUserService {
 
   /**
    * Description: Get all users with pagination
-   * @param page 
-   * @param limit 
+   * @param page
+   * @param limit
    * returns Promise<IPaginate<GetUserDto>>
    */
   getAll(page?: number, limit?: number): Promise<IPaginate<GetUserDto>>;

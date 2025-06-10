@@ -1,10 +1,10 @@
-import { useActionData } from "react-router-dom";
+import { useActionData } from 'react-router-dom';
 
 export type TActionResult<T> = {
   validationErrors?: Record<string, string[]>;
   serverError?: string | string[];
   data?: T;
-}
+};
 
 export function useCustomActionData<T>() {
   const actionData = useActionData() as TActionResult<T>;

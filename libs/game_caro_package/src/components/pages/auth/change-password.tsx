@@ -1,4 +1,8 @@
-import { Button, ErrorMessage, Input } from 'game_caro_package/components/atoms';
+import {
+  Button,
+  ErrorMessage,
+  Input,
+} from 'game_caro_package/components/atoms';
 import { InputPassword } from 'game_caro_package/components/atoms/form-tags/input-password';
 import { useToast } from 'game_caro_package/context-api';
 import { useCustomActionData } from 'game_caro_package/hooks';
@@ -13,7 +17,7 @@ export const ChangePasswordPage = () => {
 
   useEffect(() => {
     if (data === 'OK') {
-      toast("Password changed successfully, please log in again!")
+      toast('Password changed successfully, please log in again!');
       navigate(pagePaths.login);
     }
   }, [data, navigate, toast]);

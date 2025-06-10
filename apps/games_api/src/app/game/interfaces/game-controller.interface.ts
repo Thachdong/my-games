@@ -27,10 +27,7 @@ export interface IGameController {
    * - HttpStatus.OK
    * - HttpStatus.UNAUTHORIZED
    */
-  getAll(
-    page?: number,
-    limit?: number
-  ): Promise<HttpResponse<GameDto[]>>;
+  getAll(page?: number, limit?: number): Promise<HttpResponse<GameDto[]>>;
 
   /**
    * Description: Update game controller

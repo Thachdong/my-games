@@ -25,9 +25,7 @@ describe('ChatService', () => {
       ],
     }).compile();
 
-    roomRepository = module.get<Repository<Room>>(
-      getRepositoryToken(Room)
-    );
+    roomRepository = module.get<Repository<Room>>(getRepositoryToken(Room));
     messageRepository = module.get<Repository<Message>>(
       getRepositoryToken(Message)
     );

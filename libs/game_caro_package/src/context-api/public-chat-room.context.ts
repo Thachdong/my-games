@@ -6,4 +6,4 @@ const socket: Socket | void = createSocketClientService();
 
 const [useSocket, SharedSocketProvider] = createStateContext(socket);
 
-export { useSocket, SharedSocketProvider }
+export { useSocket, SharedSocketProvider };

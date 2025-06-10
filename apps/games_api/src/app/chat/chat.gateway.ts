@@ -161,9 +161,11 @@ export class ChatGateway
     if (userId) {
       await this._tournamentService.playerJoin(tournamentId, userId);
 
-      this._server.to(tournamentId).emit(ESubscribeEvents.USER_JOINED_TOURNAMENT, {
-        userId,
-      });
+      this._server
+        .to(tournamentId)
+        .emit(ESubscribeEvents.USER_JOINED_TOURNAMENT, {
+          userId,
+        });
     }
   }
 
@@ -180,9 +182,11 @@ export class ChatGateway
     if (userId) {
       await this._tournamentService.playerLeave(tournamentId, userId);
 
-      this._server.to(tournamentId).emit(ESubscribeEvents.USER_LEFT_TOURNAMENT, {
-        userId,
-      });
+      this._server
+        .to(tournamentId)
+        .emit(ESubscribeEvents.USER_LEFT_TOURNAMENT, {
+          userId,
+        });
     }
   }
 }

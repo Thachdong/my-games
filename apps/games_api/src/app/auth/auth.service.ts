@@ -19,7 +19,7 @@ export class AuthService implements IAuthService {
     @InjectRepository(User) private readonly _userRepository: Repository<User>,
     @InjectRepository(Room) private readonly _romRepositoty: Repository<Room>,
     private readonly _jwtService: JwtService,
-    private readonly _mailerService: MailerService,
+    private readonly _mailerService: MailerService
   ) {}
 
   /**

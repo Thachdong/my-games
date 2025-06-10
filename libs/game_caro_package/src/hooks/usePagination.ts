@@ -14,7 +14,7 @@ export const usePagination = <T>() => {
         const result = await fetchFunction();
         if (!result) throw new Error('Error occurred while fetching items');
 
-        setItems(prev => [...prev, ...result.data]);
+        setItems((prev) => [...prev, ...result.data]);
         setMeta(result.meta);
 
         const { total, limit, page } = result.meta;

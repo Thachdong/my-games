@@ -13,16 +13,16 @@ export const pagePaths = {
 };
 
 export enum EPagePath {
-  HOME = "/",
-  LOGIN = "/auth/login",
-  REGISTER = "/auth/register",
-  GAME = "/game",
-  TOURNAMENT = "/tournament",
-  PROFILE = "/profile",
+  HOME = '/',
+  LOGIN = '/auth/login',
+  REGISTER = '/auth/register',
+  GAME = '/game',
+  TOURNAMENT = '/tournament',
+  PROFILE = '/profile',
 }
 
 export const LOCAL_STORAGE_KEYS = {
   AUTHENTICATED_USER: 'authenticatedUser',
-}
+};
 
 export const DEFAULT_PAGE_SIZE = 25; // default number of items per page

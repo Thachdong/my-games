@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToMany, OneToMany } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Game } from 'app/game/entities';
-import { AbstractEntity } from "common/abstract-entity"
+import { AbstractEntity } from 'common/abstract-entity';
 import { Message } from 'app/chat/entities';
 
 export enum UserRole {

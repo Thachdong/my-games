@@ -53,7 +53,7 @@ export class ChatService implements IChatService {
     }
 
     // No public room exists, create one
-    const newRoom = await this._createPublicRoom()
+    const newRoom = await this._createPublicRoom();
 
     return newRoom.id;
   }
@@ -150,7 +150,7 @@ export class ChatService implements IChatService {
       page: page || 1,
       limit: take,
       total,
-      data: messages.map(({ user, ...message}) => ({
+      data: messages.map(({ user, ...message }) => ({
         ...message,
         sender: { id: user.id, username: user.username },
       })),

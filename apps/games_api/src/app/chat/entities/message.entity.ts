@@ -1,7 +1,7 @@
-import { User } from "app/user/entities/user.entity";
-import { Room } from "app/chat/entities/room.entity";
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
-import { AbstractEntity } from "common/abstract-entity";
+import { User } from 'app/user/entities/user.entity';
+import { Room } from 'app/chat/entities/room.entity';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { AbstractEntity } from 'common/abstract-entity';
 
 @Entity('message')
 export class Message extends AbstractEntity {

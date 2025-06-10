@@ -17,6 +17,6 @@ module.exports = {
       outputHashing: 'none',
       generatePackageJson: true,
     }),
-    new RunScriptWebpackPlugin({ name: 'main.js', autoRestart: true })
+    new RunScriptWebpackPlugin({ name: 'main.js', autoRestart: true }),
   ],
 };

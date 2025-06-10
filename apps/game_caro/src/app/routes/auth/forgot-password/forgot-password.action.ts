@@ -32,7 +32,7 @@ export async function forgotPasswordAction({
 
   if (result && 'error' in result) {
     return {
-      serverError: result.error
+      serverError: result.error,
     };
   }
 

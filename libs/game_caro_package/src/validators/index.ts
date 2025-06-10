@@ -11,7 +11,8 @@ export const handleZodValidation = <T>(schema: ZodTypeAny, val: T) => {
     const validationErrors: Record<string, string[]> = {};
 
     for (const key of Object.keys(errors.fieldErrors)) {
-      const fieldError = errors.fieldErrors[key as keyof typeof errors.fieldErrors];
+      const fieldError =
+        errors.fieldErrors[key as keyof typeof errors.fieldErrors];
       if (fieldError) {
         validationErrors[key] = fieldError as string[];
       }

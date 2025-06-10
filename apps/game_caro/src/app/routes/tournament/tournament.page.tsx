@@ -1,3 +1,3 @@
 export function TournamentPage() {
-    return <div>Tournament page</div>
+  return <div>Tournament page</div>;
 }

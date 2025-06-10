@@ -1,6 +1,6 @@
-import { Column, Entity, ManyToOne } from "typeorm";
-import { Game } from "./game.entity";
-import { AbstractEntity } from "../../../common/abstract-entity";
+import { Column, Entity, ManyToOne } from 'typeorm';
+import { Game } from './game.entity';
+import { AbstractEntity } from '../../../common/abstract-entity';
 
 @Entity('move')
 export class Move extends AbstractEntity {

@@ -1,6 +1,6 @@
-import { GetUserDto } from "app/user/dto/get-user.dto";
-import { AuthenticatedUserDto } from "../dto/authenticated-user.dto";
-import { RegisterDto, ChangePasswordDto, ActivateDto } from "app/auth/dto";
+import { GetUserDto } from 'app/user/dto/get-user.dto';
+import { AuthenticatedUserDto } from '../dto/authenticated-user.dto';
+import { RegisterDto, ChangePasswordDto, ActivateDto } from 'app/auth/dto';
 
 export interface IAuthService {
   /**
@@ -21,7 +21,10 @@ export interface IAuthService {
    * - Generate jwt token
    * @returns Promise<AuthenticatedUserDto | void>
    */
-  login(user: GetUserDto, startAt: number): Promise<AuthenticatedUserDto | void>;
+  login(
+    user: GetUserDto,
+    startAt: number
+  ): Promise<AuthenticatedUserDto | void>;
 
   /**
    * TODO: Implement logout

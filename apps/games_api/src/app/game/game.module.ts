@@ -9,6 +9,6 @@ import { Move } from './entities/move.entity';
   imports: [TypeOrmModule.forFeature([Game, Move])],
   providers: [GameService],
   exports: [GameService],
-  controllers: [GameController]
+  controllers: [GameController],
 })
 export class GameModule {}

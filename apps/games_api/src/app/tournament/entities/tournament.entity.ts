@@ -2,7 +2,7 @@ import { Column, Entity, ManyToMany, OneToMany, JoinTable } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Game } from '../../game/entities/game.entity';
 import { TournamentRank } from './tournament-rank.entity';
-import { AbstractEntity } from '../../../common/abstract-entity'
+import { AbstractEntity } from '../../../common/abstract-entity';
 
 @Entity('tournament')
 export class Tournament extends AbstractEntity {

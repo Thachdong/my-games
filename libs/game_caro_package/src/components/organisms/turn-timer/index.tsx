@@ -46,13 +46,17 @@ export const TurnTimer: React.FC<Readonly<TTimerProps>> = ({
   }, [isRunning, time, callback]);
 
   const progress = (timeLeft / time) * 100;
-  
+
   const formattedTime = moment.utc(timeLeft * 1000).format('mm:ss');
 
   return (
     <div className="w-full p-4">
       {/* count down */}
-      <div className={`text-center text-2xl font-bold mb-2 ${progress <= 30 ? 'text-red-600' : ''}`}>
+      <div
+        className={`text-center text-2xl font-bold mb-2 ${
+          progress <= 30 ? 'text-red-600' : ''
+        }`}
+      >
         {formattedTime}
       </div>
 

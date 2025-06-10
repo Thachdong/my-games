@@ -14,7 +14,7 @@ import { Move } from './game/entities/move.entity';
 import { JwtGuard } from './auth/guards/jwt.guard';
 import { JwtStrategy } from './auth/passport-strategies/jwt.strategy';
 import { MailerModule } from 'app/mailer/mailer.module';
-import { EConfigKeys } from 'common/constants'
+import { EConfigKeys } from 'common/constants';
 import { ChatModule } from 'app/chat/chat.module';
 import { DatabaseModule } from 'app/database/database.module';
 import { Room, Message } from 'app/chat/entities';
@@ -43,7 +43,7 @@ import { Room, Message } from 'app/chat/entities';
     GameModule,
     TournamentModule,
     ChatModule,
-    DatabaseModule
+    DatabaseModule,
   ],
   providers: [
     {

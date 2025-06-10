@@ -134,7 +134,7 @@ export class ChatController implements IChatController {
     @Query('page') page?: number,
     @Query('limit') limit?: number
   ): Promise<HttpResponse<GetMessageDto[]>> {
-    Logger.log("room id: ", roomId);
+    Logger.log('room id: ', roomId);
 
     const { data, ...meta } = await this._chatService.getChatRoomMessages(
       roomId,

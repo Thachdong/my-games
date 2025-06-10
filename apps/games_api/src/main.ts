@@ -1,4 +1,4 @@
-import "reflect-metadata";
+import 'reflect-metadata';
 import { BadRequestException, Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
@@ -6,7 +6,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { EConfigKeys } from 'common/constants';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -24,7 +24,9 @@ async function bootstrap() {
     transform: true,
     forbidNonWhitelisted: true,
     exceptionFactory: (errors) => {
-      const messages = errors.map(err => Object.values(err.constraints)).flat();
+      const messages = errors
+        .map((err) => Object.values(err.constraints))
+        .flat();
 
       return new BadRequestException(messages);
     },

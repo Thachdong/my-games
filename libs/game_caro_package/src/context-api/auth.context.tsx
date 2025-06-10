@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       setLocalUser(user);
 
-      toast("Login success!")
+      toast('Login success!');
     },
     [setUser, setLocalUser, toast]
   );

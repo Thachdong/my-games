@@ -6,7 +6,7 @@ import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 export enum ChatRoomType {
   PUBLIC = 'public',
   GAME = 'game',
-  TOURNAMENT = 'tournament'
+  TOURNAMENT = 'tournament',
 }
 
 @Entity('room')

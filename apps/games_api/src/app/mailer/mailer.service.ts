@@ -23,7 +23,10 @@ export class MailerService implements IMailService {
     });
   }
 
-  async sendActivateEmail(to: string, verificationToken: string): Promise<void> {
+  async sendActivateEmail(
+    to: string,
+    verificationToken: string
+  ): Promise<void> {
     const subject = '___ activation email!';
     const html = `
       <h5>Your activation code is: ${verificationToken}</h5>

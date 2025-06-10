@@ -116,7 +116,9 @@ export class GameController implements IGameController {
   })
   @ApiParam({ name: 'id', description: 'Game id', required: true })
   @Get(':id')
-  async getGameById(@Param('id', ParseUUIDPipe) id: string): Promise<HttpResponse<GameDto>> {
+  async getGameById(
+    @Param('id', ParseUUIDPipe) id: string
+  ): Promise<HttpResponse<GameDto>> {
     const game = await this._gameService.getGameById(id);
 
     if (!game) {
