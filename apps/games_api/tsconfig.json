@@ -31,6 +31,8 @@
       "out-tsc",
       "out-tsc-esm",
       "out-tsc-esm5"
-    ],
-  }
+    ]
+  },
+  "emitDecoratorMetadata": true,
+  "experimentalDecorators": true
 }

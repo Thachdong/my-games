@@ -88,7 +88,10 @@ describe('AuthService', () => {
     it('should return null if email is invalid', async () => {
       jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(null);
 
-      const result = await service.validateUser('invalid@example.com', 'password123');
+      const result = await service.validateUser(
+        'invalid@example.com',
+        'password123'
+      );
 
       expect(result).toBeNull();
     });
@@ -99,7 +102,10 @@ describe('AuthService', () => {
       jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(user as User);
       jest.spyOn(bcrypt, 'compare').mockResolvedValueOnce(false);
 
-      const result = await service.validateUser('test@example.com', 'wrongPassword');
+      const result = await service.validateUser(
+        'test@example.com',
+        'wrongPassword'
+      );
 
       expect(result).toBeNull();
     });
@@ -109,7 +115,11 @@ describe('AuthService', () => {
     it('should activate the user if token is valid', async () => {
       const token = 'validToken';
       const payload = { sub: 'userId' };
-      const user = { id: 'userId', verificationToken: token, isEmailVerified: false };
+      const user = {
+        id: 'userId',
+        verificationToken: token,
+        isEmailVerified: false,
+      };
 
       jest.spyOn(jwtService, 'decode').mockReturnValueOnce(payload);
       jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(user as User);
@@ -118,7 +128,9 @@ describe('AuthService', () => {
       await service.activate(token);
 
       expect(jwtService.decode).toHaveBeenCalledWith(token);
-      expect(userRepository.findOne).toHaveBeenCalledWith({ where: { id: payload.sub } });
+      expect(userRepository.findOne).toHaveBeenCalledWith({
+        where: { id: payload.sub },
+      });
       expect(userRepository.save).toHaveBeenCalledWith({
         ...user,
         isEmailVerified: true,

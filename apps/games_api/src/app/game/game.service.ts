@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Game } from './entities/game.entity';
 import { Repository } from 'typeorm';
@@ -22,8 +22,18 @@ export class GameService implements IGameService {
     @InjectRepository(Move) private readonly _moveRepository: Repository<Move>
   ) {}
 
-  async createGame(data: CreateGameDto): Promise<GameDto> {
-    const game = this._gameRepository.create(data);
+  async createGame(data: CreateGameDto, userId: string): Promise<GameDto> {
+    const playerEntity = await this._gameRepository.manager.findOne(User, { where: { id: userId } });
+
+    if (!playerEntity) {
+      throw new HttpException(`User with id ${userId} not found`, HttpStatus.BAD_REQUEST);
+    }
+
+    const game = this._gameRepository.create({
+      ...data,
+      players: [playerEntity],
+      moves: []
+    });
 
     await this._gameRepository.save(game);
 
@@ -43,6 +53,7 @@ export class GameService implements IGameService {
     const [games, total] = await this._gameRepository.findAndCount({
       take,
       skip,
+      relations: ['moves', 'players']
     });
 
     return {
@@ -60,13 +71,17 @@ export class GameService implements IGameService {
   }
 
   async getGameById(id: string): Promise<GameDto | null> {
-    const game = await this._gameRepository.findOne({ where: { id } });
+    const game = await this._gameRepository.findOne({
+      where: { id },
+      relations: ['moves', 'players'],
+    });
 
     if (!game) return null;
 
     return {
       ...game,
       moves: game.moves.map((m) => ({ ...m, gameId: game.id })),
+      players: game.players.map((p) => ({ ...p })),
     };
   }
 
@@ -98,29 +113,35 @@ export class GameService implements IGameService {
     return { ...result, gameId: result.game.id, userId: result.userId };
   }
 
-  async joinGame(gameId: string, player: User): Promise<void> {
+  async joinGame(gameId: string, playerId: string): Promise<void> {
     const game = await this._gameRepository.findOne({
       where: { id: gameId },
       relations: ['players'],
     });
 
-    if (!game) {
+    const playerEntity = await this._gameRepository.manager.findOne(User, {
+      where: {
+        id: playerId
+      }
+    })
+
+    if (!game || !playerEntity) {
       throw new HttpException(
         `Game with id ${gameId} not found`,
         HttpStatus.NOT_FOUND
       );
     }
 
-    const isPlayerAlreadyInGame = game.players.some((p) => p.id === player.id);
+    const isPlayerAlreadyInGame = game.players.some((p) => p.id === playerId);
 
     if (isPlayerAlreadyInGame) {
       throw new HttpException(
-        `Player with id ${player.id} already in game`,
+        `Player with id ${playerId} already in game`,
         HttpStatus.BAD_REQUEST
       );
     }
 
-    game.players.push(player);
+    game.players.push(playerEntity);
 
     await this._gameRepository.save(game);
   }

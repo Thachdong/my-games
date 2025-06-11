@@ -1,8 +1,15 @@
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
-import { User } from '../../user/entities/user.entity';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
+import { User } from 'app/user/entities/user.entity';
 import { Move } from './move.entity';
-import { AbstractEntity } from '../../../common/abstract-entity'
-import { Tournament } from '../../tournament/entities/tournament.entity';
+import { AbstractEntity } from 'common/abstract-entity';
+import { Tournament } from 'app/tournament/entities/tournament.entity';
 
 @Entity('game')
 export class Game extends AbstractEntity {
@@ -10,8 +17,13 @@ export class Game extends AbstractEntity {
   @JoinTable()
   players: User[];
 
-  @ManyToOne(() => Tournament, (tournament) => tournament.games, { nullable: true })
+  @ManyToOne(() => Tournament, (tournament) => tournament.games, {
+    nullable: true,
+  })
   tournament: Tournament;
+
+  @Column()
+  roundTime: number
 
   @Column({ nullable: true })
   startTime: Date;

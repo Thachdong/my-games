@@ -9,7 +9,9 @@ export class UpdateTournamentTitleDto {
 }
 
 export class TournamentPlayerDto {
-  @ApiProperty({ description: 'The ID of the user participating in the tournament' })
+  @ApiProperty({
+    description: 'The ID of the user participating in the tournament',
+  })
   @IsNotEmpty()
   @IsString()
   userId: string;

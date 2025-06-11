@@ -14,8 +14,8 @@ export const databaseProvider = [
         username: configService.get(EConfigKeys.DB_USERNAME, 'dongt'),
         password: configService.get(EConfigKeys.DB_PASSWORD, 'dongt'),
         database: configService.get(EConfigKeys.DB_DATABASE, 'gomoku_v1'),
-        entities: [__dirname + '/../**/*.entity.{ts,js}'],
-        synchronize: false,
+        entities: [__dirname + '/**/*.entity.{ts,js}'],
+        synchronize: true,
       };
 
       const dataSource = new DataSource(options);

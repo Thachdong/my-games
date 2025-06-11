@@ -1,6 +1,6 @@
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ActivateDto } from './dto/activate.dto';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from '../user/entities/user.entity';
@@ -11,15 +11,15 @@ import { AuthenticatedUserDto } from './dto/authenticated-user.dto';
 import { GetUserDto } from '../user/dto/get-user.dto';
 import { IAuthService } from './interfaces/auth-service.interface';
 import { MailerService } from 'app/mailer/mailer.service';
-import { ConfigService } from '@nestjs/config';
+import { ChatRoomType, Room } from 'app/chat/entities';
 
 @Injectable()
 export class AuthService implements IAuthService {
   constructor(
     @InjectRepository(User) private readonly _userRepository: Repository<User>,
+    @InjectRepository(Room) private readonly _romRepositoty: Repository<Room>,
     private readonly _jwtService: JwtService,
-    private readonly _mailerService: MailerService,
-    private readonly _configService: ConfigService
+    private readonly _mailerService: MailerService
   ) {}
 
   /**
@@ -55,7 +55,7 @@ export class AuthService implements IAuthService {
   private async _generateJwtToken(
     userId: string,
     email: string,
-    iat: number,
+    iat: number
   ): Promise<string> {
     const payload = { sub: userId, email, iat };
 
@@ -90,8 +90,14 @@ export class AuthService implements IAuthService {
     await this._userRepository.save(user);
 
     // Send verification email
-    await this._mailerService.sendActivateEmail(user.email, verificationToken);
-
+    try {
+      await this._mailerService.sendActivateEmail(
+        user.email,
+        verificationToken
+      );
+    } catch (error) {
+      Logger.log(JSON.stringify(error));
+    }
     delete user.password;
 
     return user;
@@ -115,16 +121,29 @@ export class AuthService implements IAuthService {
       return null;
     }
 
-    delete user['password']
+    delete user['password'];
 
     return user;
   }
 
-  async login(user: GetUserDto, startAt: number): Promise<AuthenticatedUserDto | void> {
-    const accessToken = await this._generateJwtToken(user.id, user.email, startAt);
+  async login(
+    user: GetUserDto,
+    startAt: number
+  ): Promise<AuthenticatedUserDto | void> {
+    const accessToken = await this._generateJwtToken(
+      user.id,
+      user.email,
+      startAt
+    );
+
+    const publicRoom = await this._romRepositoty.findOne({
+      where: { type: ChatRoomType.PUBLIC },
+      order: { createdAt: 'ASC' },
+    });
 
     return {
       accessToken,
+      publicRoomId: publicRoom?.id,
       ...user,
     };
   }

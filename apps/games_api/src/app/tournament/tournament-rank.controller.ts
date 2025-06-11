@@ -10,7 +10,12 @@ import {
   Patch,
   Query,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { TournamentRankService } from 'app/tournament/tournament-rank.service';
 import { GenericApiResponse } from 'decorators';
 import { HttpResponse } from 'common/http-response';

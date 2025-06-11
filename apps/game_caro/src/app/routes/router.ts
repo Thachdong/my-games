@@ -4,12 +4,23 @@ import { loginAction, LoginPage } from './auth/login';
 import { registerAction, RegisterPage } from './auth/register';
 import { homeAction, homeLoader, HomePage } from './home';
 import { gameAction, gameLoader, GamePage } from './game';
-import { tournamentAction, tournamentLoader, TournamentPage } from './tournament';
+import {
+  tournamentAction,
+  tournamentLoader,
+  TournamentPage,
+} from './tournament';
 import { profileAction, profileLoader, ProfilePage } from './profile';
 import { ActivatePage } from './auth/activate';
-import { forgotPasswordAction, ForgotPasswordPage } from './auth/forgot-password';
-import { changePasswordAction, ChangePasswordPage } from './auth/change-password';
+import {
+  forgotPasswordAction,
+  ForgotPasswordPage,
+} from './auth/forgot-password';
+import {
+  changePasswordAction,
+  ChangePasswordPage,
+} from './auth/change-password';
 import { activateAction } from './auth/activate/activate.action';
+import { ProtectedLayout } from './protected-layout';
 
 export const router = createBrowserRouter([
   // AUTH ROUTES
@@ -22,12 +33,12 @@ export const router = createBrowserRouter([
         index: true,
         path: 'login',
         Component: LoginPage,
-        action: loginAction
+        action: loginAction,
       },
       {
         path: 'register',
         Component: RegisterPage,
-        action: registerAction
+        action: registerAction,
       },
       {
         path: 'activate',
@@ -37,45 +48,53 @@ export const router = createBrowserRouter([
       {
         path: 'forgot-password',
         Component: ForgotPasswordPage,
-        action: forgotPasswordAction
+        action: forgotPasswordAction,
       },
       {
         path: 'change-password',
         Component: ChangePasswordPage,
-        action: changePasswordAction
-      }
+        action: changePasswordAction,
+      },
     ],
   },
-  // HOME ROUTES
+  // PROTECTED ROUTE
   {
-    id: 'home',
+    id: 'protected',
     path: '/',
-    Component: HomePage,
-    loader: homeLoader,
-    action: homeAction,
-  },
-  // GAME ROUTES
-  {
-    id: 'game',
-    path: '/game',
-    Component: GamePage,
-    action: gameAction,
-    loader: gameLoader,
-  },
-  // TOURNAMENT ROUTES
-  {
-    id: 'tournament',
-    path: '/tournament',
-    Component: TournamentPage,
-    action: tournamentAction,
-    loader: tournamentLoader,
-  },
-  // PROFILE ROUTES
-  {
-    id: 'profile',
-    path: '/profile',
-    Component: ProfilePage,
-    action: profileAction,
-    loader: profileLoader
+    Component: ProtectedLayout,
+    children: [
+      // HOME ROUTES
+      {
+        id: 'home',
+        index: true,
+        Component: HomePage,
+        loader: homeLoader,
+        action: homeAction,
+      },
+      // GAME ROUTES
+      {
+        id: 'game',
+        path: '/game',
+        Component: GamePage,
+        action: gameAction,
+        loader: gameLoader,
+      },
+      // TOURNAMENT ROUTES
+      {
+        id: 'tournament',
+        path: '/tournament',
+        Component: TournamentPage,
+        action: tournamentAction,
+        loader: tournamentLoader,
+      },
+      // PROFILE ROUTES
+      {
+        id: 'profile',
+        path: '/profile',
+        Component: ProfilePage,
+        action: profileAction,
+        loader: profileLoader,
+      },
+    ],
   },
 ]);

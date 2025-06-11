@@ -10,15 +10,9 @@ import { EConfigKeys } from 'common/constants';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        console.log(
-          'MailerModule useFactory called with configService:',
-          configService.get<string>(EConfigKeys.MAILER_HOST)
-        );
         return {
           transport: {
-            host: configService.get<string>(
-              EConfigKeys.MAILER_HOST,
-            ),
+            host: configService.get<string>(EConfigKeys.MAILER_HOST),
             port: Number(
               configService.get<string>(EConfigKeys.MAILER_PORT, '587')
             ),

@@ -1,3 +1,3 @@
 export async function gameLoader() {
-  return 'gameLoader not implemented'
+  return 'gameLoader not implemented';
 }

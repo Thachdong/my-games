@@ -1,5 +1,5 @@
-import { createParamDecorator, ExecutionContext } from "@nestjs/common";
-import { TFullJwtPayload } from "types";
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { TFullJwtPayload } from 'types';
 
 export const JwtPayload = createParamDecorator(
   (data: unknown, ctx: ExecutionContext): TFullJwtPayload => {

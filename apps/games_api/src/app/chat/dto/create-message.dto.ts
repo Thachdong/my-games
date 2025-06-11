@@ -6,7 +6,7 @@ export class CreateMessageDto {
     description: 'The ID of the chat room',
   })
   @IsUUID('4', { message: 'roomId must be a valid UUID' })
-  roomId: string;
+  roomId: string | null;
 
   @ApiProperty({
     description: 'The ID of the user sending the message',

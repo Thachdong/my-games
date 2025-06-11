@@ -1,2 +1,2 @@
-export * from "./user-controller.interface"
-export * from "./user-service.interface"
+export * from './user-controller.interface';
+export * from './user-service.interface';

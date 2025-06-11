@@ -1,4 +1,4 @@
-import { GameMoveBodyDto, MessageBodyDto } from 'app/chat/dto';
+import { GameMoveBodyDto, JoinChatRoomDto, MessageBodyDto } from 'app/chat/dto';
 import {
   ConnectedSocket,
   MessageBody,
@@ -15,8 +15,19 @@ import { GameService } from 'app/game/game.service';
 import { CreateMoveDto } from 'app/game/dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'app/user/user.service';
+import { Logger } from '@nestjs/common';
+import { TournamentService } from 'app/tournament/tournament.service';
 
-@WebSocketGateway()
+export enum ESubscribeEvents {
+  JOIN_ROOM = 'joinRoom',
+  MESSAGE = 'message',
+  GAME_MOVE = 'gameMove',
+  USER_JOINED_GAME = 'userJoinedGame',
+  USER_JOINED_TOURNAMENT = 'userJoinedTournament',
+  USER_LEFT_TOURNAMENT = 'userLeftTournament',
+}
+
+@WebSocketGateway({ cors: true })
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
@@ -27,14 +38,15 @@ export class ChatGateway
     private readonly _chatService: ChatService,
     private readonly _gameService: GameService,
     private readonly _jwtService: JwtService,
-    private readonly _userService: UserService
+    private readonly _userService: UserService,
+    private readonly _tournamentService: TournamentService
   ) {}
 
   /**
    * ============================= life circle methods =================================
    */
   afterInit() {
-    console.log('WebSocket server initialized');
+    Logger.log('WebSocket server initialized');
   }
 
   handleConnection(client: Socket) {
@@ -48,27 +60,27 @@ export class ChatGateway
 
       const payload = this._jwtService.verify(token);
       client.data.user = payload;
-      console.log(`Client connected: ${client.id}, user: ${payload.email}`);
+      Logger.log(`Client connected: ${client.id}, user: ${payload.email}`);
     } catch (error) {
-      console.error('Error during WebSocket connection:', error);
+      Logger.error('Error during WebSocket connection:', error);
       client.disconnect();
     }
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`Client disconnected: ${client.id}`);
+    Logger.log(`Client disconnected: ${client.id}`);
   }
 
   /**
-   * ============================= socket events =================================
+   * ============================= Event: Message =================================
    */
-  @SubscribeMessage('message')
+  @SubscribeMessage(ESubscribeEvents.MESSAGE)
   async handleMessage(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: MessageBodyDto
   ) {
     const { roomId, message } = payload;
-    const userId = client.data.user.id;
+    const userId = client.data.user.sub;
 
     const result = await this._chatService.createMessage({
       roomId,
@@ -76,10 +88,26 @@ export class ChatGateway
       content: message,
     });
 
-    client.to(roomId).emit('message', result);
+    this._server.to(roomId).emit(ESubscribeEvents.MESSAGE, result);
   }
 
-  @SubscribeMessage('gameMove')
+  /**
+   * ============================= Event: GAME_MOVE =================================
+   */
+  @SubscribeMessage(ESubscribeEvents.JOIN_ROOM)
+  async handleJoinChatRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: JoinChatRoomDto
+  ) {
+    const { roomId } = payload;
+
+    client.join(roomId);
+  }
+
+  /**
+   * ============================= Event: GAME_MOVE =================================
+   */
+  @SubscribeMessage(ESubscribeEvents.GAME_MOVE)
   async handleGameAction(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: GameMoveBodyDto
@@ -97,23 +125,68 @@ export class ChatGateway
 
     const createdMove = await this._gameService.addMove(moveData);
 
-    client.to(gameId).emit('gameMove', createdMove);
+    this._server.to(gameId).emit(ESubscribeEvents.GAME_MOVE, createdMove);
   }
 
-  @SubscribeMessage('userJoinedGame')
+  /**
+   * ============================= Event: USER_JOINED_GAME =================================
+   */
+  @SubscribeMessage(ESubscribeEvents.USER_JOINED_GAME)
   async handleJoinRoom(
     @ConnectedSocket() client: Socket,
-    @MessageBody() roomId: string
+    @MessageBody() gameId: string
   ) {
     const userId = client.data.user.id;
     const user = await this._userService.getUserById(userId);
 
     if (user) {
-      await this._gameService.joinGame(roomId, user);
+      await this._gameService.joinGame(gameId, user.id);
 
-      client.to(roomId).emit('userJoinedGame', {
+      this._server.to(gameId).emit(ESubscribeEvents.USER_JOINED_GAME, {
         userId: user.id,
       });
+    }
+  }
+
+  /**
+   * ============================= Event: USER_JOINED_TOURNAMENT =================================
+   */
+  @SubscribeMessage(ESubscribeEvents.USER_JOINED_TOURNAMENT)
+  async handleLeaveRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() tournamentId: string
+  ) {
+    const userId = client.data.user.sub;
+
+    if (userId) {
+      await this._tournamentService.playerJoin(tournamentId, userId);
+
+      this._server
+        .to(tournamentId)
+        .emit(ESubscribeEvents.USER_JOINED_TOURNAMENT, {
+          userId,
+        });
+    }
+  }
+
+  /**
+   * ============================= Event: USER_LEFT_TOURNAMENT =================================
+   */
+  @SubscribeMessage(ESubscribeEvents.USER_LEFT_TOURNAMENT)
+  async handleRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() tournamentId: string
+  ) {
+    const userId = client.data.user.sub;
+
+    if (userId) {
+      await this._tournamentService.playerLeave(tournamentId, userId);
+
+      this._server
+        .to(tournamentId)
+        .emit(ESubscribeEvents.USER_LEFT_TOURNAMENT, {
+          userId,
+        });
     }
   }
 }

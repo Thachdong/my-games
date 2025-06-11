@@ -1,3 +1,5 @@
+import { HomePage as Page } from 'game_caro_package/components/pages';
+
 export function HomePage() {
-    return <div>home page</div>
+  return <Page />;
 }

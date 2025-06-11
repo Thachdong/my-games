@@ -1,14 +1,13 @@
 import { Repository } from 'typeorm';
 import { ChatService } from './chat.service';
-import { ChatRoom, ChatRoomType } from './entities/chat-room.entity';
-import { ChatMessage } from './entities/chat-message.entity';
+import { Room, ChatRoomType, Message } from './entities';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from 'app/user/entities/user.entity';
 
 describe('ChatService', () => {
-  let roomRepository: Repository<ChatRoom>;
-  let messageRepository: Repository<ChatMessage>;
+  let roomRepository: Repository<Room>;
+  let messageRepository: Repository<Message>;
   let chatService: ChatService;
 
   beforeEach(async () => {
@@ -16,21 +15,19 @@ describe('ChatService', () => {
       providers: [
         ChatService,
         {
-          provide: getRepositoryToken(ChatRoom),
-          useClass: Repository<ChatRoom>,
+          provide: getRepositoryToken(Room),
+          useClass: Repository<Room>,
         },
         {
-          provide: getRepositoryToken(ChatMessage),
-          useClass: Repository<ChatMessage>,
+          provide: getRepositoryToken(Message),
+          useClass: Repository<Message>,
         },
       ],
     }).compile();
 
-    roomRepository = module.get<Repository<ChatRoom>>(
-      getRepositoryToken(ChatRoom)
-    );
-    messageRepository = module.get<Repository<ChatMessage>>(
-      getRepositoryToken(ChatMessage)
+    roomRepository = module.get<Repository<Room>>(getRepositoryToken(Room));
+    messageRepository = module.get<Repository<Message>>(
+      getRepositoryToken(Message)
     );
     chatService = module.get<ChatService>(ChatService);
   });
@@ -48,7 +45,7 @@ describe('ChatService', () => {
         type: ChatRoomType.PUBLIC,
       };
 
-      const room = new ChatRoom();
+      const room = new Room();
       room.messages = [];
       Object.assign(room, roomData);
 
@@ -73,7 +70,7 @@ describe('ChatService', () => {
       user.id = messageData.userId;
       user.username = 'TestUser';
 
-      const message = new ChatMessage();
+      const message = new Message();
       Object.assign(message, messageData);
 
       jest.spyOn(messageRepository, 'create').mockReturnValue(message);
@@ -94,9 +91,9 @@ describe('ChatService', () => {
     it('should return paginated chat rooms', async () => {
       const page = 1;
       const limit = 10;
-      const room1 = new ChatRoom();
+      const room1 = new Room();
       room1.messages = [];
-      const room2 = new ChatRoom();
+      const room2 = new Room();
       room2.messages = [];
       const rooms = [room1, room2];
 
@@ -112,7 +109,7 @@ describe('ChatService', () => {
     it('should return paginated with empty chat rooms', async () => {
       const page = 1;
       const limit = 10;
-      const rooms: ChatRoom[] = [];
+      const rooms: Room[] = [];
 
       jest.spyOn(roomRepository, 'findAndCount').mockResolvedValue([rooms, 0]);
 
@@ -127,7 +124,7 @@ describe('ChatService', () => {
   describe('Test method getChatRoom', () => {
     it('should return a chat room', async () => {
       const roomId = 'b3e1c2a4-5d6f-4e7a-8b9c-0d1e2f3a4b5c';
-      const room = new ChatRoom();
+      const room = new Room();
       room.id = roomId;
       room.messages = [];
 
@@ -157,10 +154,10 @@ describe('ChatService', () => {
       const roomId = 'b3e1c2a4-5d6f-4e7a-8b9c-0d1e2f3a4b5c';
       const page = 1;
       const limit = 10;
-      const message1 = new ChatMessage();
+      const message1 = new Message();
       message1.roomId = roomId;
       message1.content = 'Test Message 1';
-      const message2 = new ChatMessage();
+      const message2 = new Message();
       message2.roomId = roomId;
       message2.content = 'Test Message 2';
       const messages = [message1, message2];
@@ -191,7 +188,7 @@ describe('ChatService', () => {
   describe('Test method deleteChatRoom', () => {
     it('should delete a chat room', async () => {
       const roomId = 'b3e1c2a4-5d6f-4e7a-8b9c-0d1e2f3a4b5c';
-      const room = new ChatRoom();
+      const room = new Room();
 
       jest.spyOn(roomRepository, 'findOne').mockResolvedValue(room);
       jest.spyOn(roomRepository, 'delete').mockResolvedValue(undefined);
@@ -217,7 +214,7 @@ describe('ChatService', () => {
     it('should update a chat room name', async () => {
       const roomId = 'b3e1c2a4-5d6f-4e7a-8b9c-0d1e2f3a4b5c';
       const newName = 'Updated Room Name';
-      const room = new ChatRoom();
+      const room = new Room();
       room.id = roomId;
       room.name = 'Old Room Name';
 

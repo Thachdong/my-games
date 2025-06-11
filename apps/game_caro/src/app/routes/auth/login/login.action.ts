@@ -1,14 +1,17 @@
-import { loginService } from 'game_caro/services/auth.service';
+import {
+  loginService,
+  TAuthenticatedUser,
+} from 'game_caro_package/services/auth.service';
 import {
   ELocalStorageKeys,
   setLocalStorageService,
-} from 'game_caro/services/localstorage.service';
-import { TActionResult } from 'game_caro/types';
+} from 'game_caro_package/services/localstorage.service';
+import { TActionResult } from 'game_caro_package/types';
 import {
   handleZodValidation,
   loginSchema,
   TLoginForm,
-} from 'game_caro/validators';
+} from 'game_caro_package/validators';
 import { ActionFunctionArgs } from 'react-router-dom';
 
 /**
@@ -22,7 +25,7 @@ import { ActionFunctionArgs } from 'react-router-dom';
  */
 export async function loginAction({
   request,
-}: ActionFunctionArgs): Promise<TActionResult<'OK'>> {
+}: ActionFunctionArgs): Promise<TActionResult<TAuthenticatedUser>> {
   const formData = await request.formData();
 
   const data: TLoginForm = {
@@ -40,22 +43,19 @@ export async function loginAction({
   }
 
   // Call the login service
-  const { error, data: authenticatedUser } = await loginService(data);
+  const result = await loginService(data);
 
-  if (error) {
+  if ('error' in result) {
     return {
-      serverError: typeof error === 'string' ? error : error.messages,
+      serverError: result.error,
     };
   }
 
-  if (authenticatedUser) {
-    setLocalStorageService(
-      ELocalStorageKeys.AUTHENTICATED_USER,
-      authenticatedUser
-    );
+  if ('data' in result) {
+    setLocalStorageService(ELocalStorageKeys.AUTHENTICATED_USER, result.data);
   }
 
   return {
-    data: 'OK',
+    data: result,
   };
 }

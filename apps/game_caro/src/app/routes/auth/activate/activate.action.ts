@@ -1,10 +1,10 @@
-import { activateService } from 'game_caro/services/auth.service';
-import { TActionResult } from 'game_caro/types';
+import { activateService } from 'game_caro_package/services/auth.service';
+import { TActionResult } from 'game_caro_package/types';
 import {
   activateSchema,
   handleZodValidation,
   TActivateForm,
-} from 'game_caro/validators';
+} from 'game_caro_package/validators';
 import { ActionFunctionArgs } from 'react-router-dom';
 
 export async function activateAction({
@@ -25,11 +25,11 @@ export async function activateAction({
     };
   }
 
-  const { error } = await activateService(data);
+  const result = await activateService(data);
 
-  if (error) {
+  if (result && 'error' in result) {
     return {
-      serverError: typeof error === 'string' ? error : error.messages,
+      serverError: result.error,
     };
   }
 

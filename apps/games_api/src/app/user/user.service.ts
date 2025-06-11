@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { InjectRepository } from "@nestjs/typeorm";
+import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { PAGE_SIZE } from 'common/constants';
 import { UpdateUserDto } from 'app/user/dto';
@@ -18,7 +18,10 @@ export class UserService implements IUserService {
     const user = await this._userRepository.findOne({ where: { id } });
 
     if (!user) {
-      throw new HttpException(`User with ID "${id}" does not exist!`, HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        `User with ID "${id}" does not exist!`,
+        HttpStatus.BAD_REQUEST
+      );
     }
 
     await this._userRepository.update(id, data);
@@ -40,7 +43,7 @@ export class UserService implements IUserService {
       );
     }
 
-    delete user['password']
+    delete user['password'];
 
     return user;
   }
@@ -57,7 +60,7 @@ export class UserService implements IUserService {
       page: page || 1,
       limit: limit || PAGE_SIZE,
       total,
-      data: users.map(({ password, ...u}) => ({ ...u}))
+      data: users.map(({ password, ...u }) => ({ ...u })),
     };
   }
 }

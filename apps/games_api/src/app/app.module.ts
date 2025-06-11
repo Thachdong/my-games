@@ -14,13 +14,15 @@ import { Move } from './game/entities/move.entity';
 import { JwtGuard } from './auth/guards/jwt.guard';
 import { JwtStrategy } from './auth/passport-strategies/jwt.strategy';
 import { MailerModule } from 'app/mailer/mailer.module';
-import { EConfigKeys } from 'common/constants'
+import { EConfigKeys } from 'common/constants';
+import { ChatModule } from 'app/chat/chat.module';
+import { DatabaseModule } from 'app/database/database.module';
+import { Room, Message } from 'app/chat/entities';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env.game-api',
     }),
     TypeOrmModule.forRootAsync({
       useFactory: async () => ({
@@ -30,7 +32,7 @@ import { EConfigKeys } from 'common/constants'
         username: process.env[EConfigKeys.DB_USERNAME] || 'dongt',
         password: process.env[EConfigKeys.DB_PASSWORD] || 'dongt',
         database: process.env[EConfigKeys.DB_DATABASE] || 'gomoku_v1',
-        entities: [User, Tournament, TournamentRank, Move, Game],
+        entities: [User, Tournament, TournamentRank, Move, Game, Room, Message],
         synchronize: true,
       }),
     }),
@@ -40,6 +42,8 @@ import { EConfigKeys } from 'common/constants'
     UserModule,
     GameModule,
     TournamentModule,
+    ChatModule,
+    DatabaseModule,
   ],
   providers: [
     {

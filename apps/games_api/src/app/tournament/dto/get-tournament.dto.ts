@@ -18,11 +18,21 @@ export class GetTournamentDto {
   @IsNotEmpty()
   creatorId: string;
 
-  @ApiProperty({ example: '2023-10-01T10:00:00Z', required: true, type: String, format: 'date-time' })
+  @ApiProperty({
+    example: '2023-10-01T10:00:00Z',
+    required: true,
+    type: String,
+    format: 'date-time',
+  })
   @IsDate()
   startTime: Date;
 
-  @ApiProperty({ example: '2023-10-31T10:00:00Z', required: true, type: String, format: 'date-time' })
+  @ApiProperty({
+    example: '2023-10-31T10:00:00Z',
+    required: true,
+    type: String,
+    format: 'date-time',
+  })
   @IsDate()
   endTime: Date;
 

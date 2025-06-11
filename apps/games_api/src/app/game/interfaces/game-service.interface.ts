@@ -14,7 +14,7 @@ export interface IGameService {
    * @param data - CreateGameDto
    * @returns game - GameDto
    */
-  createGame(data: CreateGameDto): Promise<GameDto>;
+  createGame(data: CreateGameDto, userId: string): Promise<GameDto>;
 
   /**
    * Description: Get all games
@@ -53,9 +53,9 @@ export interface IGameService {
   /**
    * Description: Player join game
    * @param gameId - UUID - game id
-   * @param player - PlayerDto - player
+   * @param playerId - UUID - player
    * @returns Promise<void>
    * @throws NOT_FOUND
    */
-  joinGame(gameId: string, player: PlayerDto): Promise<void>;
+  joinGame(gameId: string, playerId: string): Promise<void>;
 }

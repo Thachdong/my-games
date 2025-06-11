@@ -10,10 +10,11 @@ import { JwtStrategy } from './passport-strategies/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { MailerModule } from 'app/mailer/mailer.module';
 import { EConfigKeys } from 'common/constants';
+import { Room } from 'app/chat/entities';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Room]),
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

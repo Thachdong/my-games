@@ -92,7 +92,7 @@ describe('UserService', () => {
 
       jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(undefined);
 
-      await expect(userService.getUserById(userId)).rejects.toThrow()
+      await expect(userService.getUserById(userId)).rejects.toThrow();
     });
   });
 

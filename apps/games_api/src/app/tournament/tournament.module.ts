@@ -11,7 +11,7 @@ import { TournamentRankController } from 'app/tournament/tournament-rank.control
 @Module({
   imports: [TypeOrmModule.forFeature([Tournament, TournamentRank, User])],
   providers: [TournamentService, TournamentRankService],
-  exports: [],
+  exports: [TournamentService],
   controllers: [TournamentController, TournamentRankController],
 })
 export class TournamentModule {}

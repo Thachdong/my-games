@@ -1,10 +1,10 @@
-import { changePasswordService } from 'game_caro/services/auth.service';
-import { TActionResult } from 'game_caro/types';
+import { changePasswordService } from 'game_caro_package/services/auth.service';
+import { TActionResult } from 'game_caro_package/types';
 import {
   changePasswordSchema,
   handleZodValidation,
   TChangePasswordForm,
-} from 'game_caro/validators';
+} from 'game_caro_package/validators';
 import { ActionFunctionArgs } from 'react-router-dom';
 
 export async function changePasswordAction({
@@ -32,15 +32,15 @@ export async function changePasswordAction({
   }
 
   // Call the change password service
-  const { error } = await changePasswordService({
+  const result = await changePasswordService({
     confirmHash: validatedData.confirmHash,
     email: validatedData.email,
     password: validatedData.password,
   });
 
-  if (error) {
+  if (result && 'error' in result) {
     return {
-      serverError: typeof error === 'string' ? error : error.messages,
+      serverError: result.error,
     };
   }
 

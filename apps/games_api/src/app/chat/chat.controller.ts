@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpStatus,
+  Logger,
   Param,
   ParseIntPipe,
   ParseUUIDPipe,
@@ -127,12 +128,14 @@ export class ChatController implements IChatController {
     required: false,
     description: 'Limit number of messages per page',
   })
-  @Get('/rooms/:roomId/messages')
+  @Get('rooms/:roomId/messages')
   async getChatRoomMessages(
     @Param('roomId', ParseUUIDPipe) roomId: string,
-    @Query('page', ParseUUIDPipe) page?: number,
-    @Query('limit', ParseUUIDPipe) limit?: number
+    @Query('page') page?: number,
+    @Query('limit') limit?: number
   ): Promise<HttpResponse<GetMessageDto[]>> {
+    Logger.log('room id: ', roomId);
+
     const { data, ...meta } = await this._chatService.getChatRoomMessages(
       roomId,
       page,

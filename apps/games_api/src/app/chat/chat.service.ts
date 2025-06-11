@@ -1,7 +1,7 @@
 import { IChatService } from 'app/chat/interfaces';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ChatMessage, ChatRoom } from 'app/chat/entities';
+import { Message, Room, ChatRoomType } from 'app/chat/entities';
 import { Repository } from 'typeorm';
 import {
   CreateChatRoomDto,
@@ -15,10 +15,10 @@ import { PAGE_SIZE } from 'common/constants';
 @Injectable()
 export class ChatService implements IChatService {
   constructor(
-    @InjectRepository(ChatRoom)
-    private readonly _roomRepository: Repository<ChatRoom>,
-    @InjectRepository(ChatMessage)
-    private readonly _messageRepository: Repository<ChatMessage>
+    @InjectRepository(Room)
+    private readonly _roomRepository: Repository<Room>,
+    @InjectRepository(Message)
+    private readonly _messageRepository: Repository<Message>
   ) {}
 
   async createChatRoom(data: CreateChatRoomDto): Promise<GetChatRoomDto> {
@@ -29,8 +29,37 @@ export class ChatService implements IChatService {
     return { ...savedRoom, messages: [] };
   }
 
+  private async _createPublicRoom(): Promise<Room> {
+    const newPublicRoom = this._roomRepository.create({
+      name: 'Public Chat Room',
+      type: ChatRoomType.PUBLIC,
+    });
+
+    const savedRoom = await this._roomRepository.save(newPublicRoom);
+
+    return savedRoom;
+  }
+
+  async getPublicRoomId(): Promise<string> {
+    // Get all rooms with type PUBLIC
+    const publicRooms = await this._roomRepository.findOne({
+      where: { type: ChatRoomType.PUBLIC },
+      order: { createdAt: 'ASC' },
+    });
+
+    if (publicRooms) {
+      // If a public room exists, return its ID
+      return publicRooms.id;
+    }
+
+    // No public room exists, create one
+    const newRoom = await this._createPublicRoom();
+
+    return newRoom.id;
+  }
+
   async createMessage(data: CreateMessageDto): Promise<GetMessageDto> {
-    const message = this._messageRepository.create(data);
+    const message = this._messageRepository.create({ ...data });
 
     await this._messageRepository.save(message);
 
@@ -105,6 +134,7 @@ export class ChatService implements IChatService {
     const [messages, total] = await this._messageRepository.findAndCount({
       where: { roomId },
       relations: ['user'],
+      order: { createdAt: 'DESC' },
       take,
       skip,
     });
@@ -120,9 +150,9 @@ export class ChatService implements IChatService {
       page: page || 1,
       limit: take,
       total,
-      data: messages.map((message) => ({
+      data: messages.map(({ user, ...message }) => ({
         ...message,
-        sender: { ...message.user },
+        sender: { id: user.id, username: user.username },
       })),
     };
   }
