@@ -25,6 +25,8 @@ export const ProtectedLayout = () => {
             <button onClick={logout}>Logout</button>
           </div>
         </div>
+
+        <div id="modal-root"></div>
         <Outlet />
       </div>
     </div>

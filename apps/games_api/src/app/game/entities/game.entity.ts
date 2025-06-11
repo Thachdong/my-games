@@ -22,6 +22,9 @@ export class Game extends AbstractEntity {
   })
   tournament: Tournament;
 
+  @Column()
+  roundTime: number
+
   @Column({ nullable: true })
   startTime: Date;
 

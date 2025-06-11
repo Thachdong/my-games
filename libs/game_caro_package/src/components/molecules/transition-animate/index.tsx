@@ -1,3 +1,4 @@
+"use client"
 import React from 'react';
 import { SwitchTransition, CSSTransition } from 'react-transition-group';
 import { CSSTransitionProps } from 'react-transition-group/CSSTransition';

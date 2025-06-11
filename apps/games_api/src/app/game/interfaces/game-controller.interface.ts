@@ -5,6 +5,7 @@ import {
   UpdateGameDto,
 } from 'app/game/dto';
 import { HttpResponse } from 'common/http-response';
+import { TJwtPayload } from 'types';
 
 export interface IGameController {
   /**
@@ -16,7 +17,7 @@ export interface IGameController {
    * - HttpStatus.BAD_REQUEST
    * - HttpStatus.UNAUTHORIZED
    */
-  create(data: CreateGameDto): Promise<HttpResponse<void>>;
+  create(data: CreateGameDto, payload: TJwtPayload): Promise<HttpResponse<void>>;
 
   /**
    * Description: Get all games controller
@@ -64,4 +65,11 @@ export interface IGameController {
    * - HttpStatus.UNAUTHORIZED
    */
   addMove(id: string, data: CreateMoveDto): Promise<HttpResponse<void>>;
+
+  /**
+   * Description: User join game controller
+   * @param gameId - UUID
+   * @param jwtPayload - Jwt payload
+   */
+  join(gameId: string, jwtPayload: TJwtPayload): Promise<HttpResponse<void>>;
 }

@@ -1,6 +1,6 @@
 import 'reflect-metadata';
-import { BadRequestException, Logger, ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import { BadRequestException, ClassSerializerInterceptor, Logger, ValidationPipe } from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { EConfigKeys } from 'common/constants';
@@ -33,6 +33,9 @@ async function bootstrap() {
   });
 
   app.useGlobalPipes(validationPipe);
+
+  // Global interceptor
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)))
 
   // Setup Swagger documentation
   const config = new DocumentBuilder()

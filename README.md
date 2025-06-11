@@ -142,3 +142,30 @@ Controllers
 - chat (/messages?type=public, tournamentId, roomId, /game-list)
 - user (/profile)
 - game (/create, /gameId, /all)
+
+
+Game:
+1. Create:
+   - roundTime: 15s, 20s, 30s, 45s, 1p
+
+2. Get Detail
+   - id
+   - roundTime
+   - players: id, username, avatar, score
+   - moves
+   - status
+   - createdAt
+
+3. Join
+   - gameId
+
+4. Ready
+   - gameId
+
+5. Start
+   - gameId
+
+6. Move
+   - gameId
+   - positionX
+   - positionY

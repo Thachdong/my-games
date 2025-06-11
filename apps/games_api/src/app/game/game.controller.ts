@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpStatus,
+  Logger,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -14,7 +15,6 @@ import {
   ApiOperation,
   ApiParam,
   ApiQuery,
-  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { CreateGameDto } from './dto/create-game.dto';
@@ -25,6 +25,8 @@ import { IGameController } from 'app/game/interfaces';
 import { HttpResponse } from 'common/http-response';
 import { GenericApiResponse } from 'decorators/generic-api-response.decorator';
 import { GameDto } from 'app/game/dto';
+import { JwtPayload } from 'app/auth/decorators';
+import { TJwtPayload } from 'types';
 
 @ApiTags('game')
 @ApiBearerAuth('access-token')
@@ -49,8 +51,13 @@ export class GameController implements IGameController {
     description: 'Unauthorized access',
   })
   @Post()
-  async create(@Body() data: CreateGameDto): Promise<HttpResponse<void>> {
-    await this._gameService.createGame(data);
+  async create(
+    @Body() data: CreateGameDto,
+    @JwtPayload() payload: TJwtPayload
+  ): Promise<HttpResponse<void>> {
+    Logger.log('CurrentUser: ', JSON.stringify(payload));
+
+    await this._gameService.createGame(data, payload.sub);
 
     return {
       statusCode: HttpStatus.CREATED,
@@ -168,15 +175,15 @@ export class GameController implements IGameController {
    * ============================ addMove =================================
    */
   @ApiOperation({ summary: 'Add a move to the game' })
-  @ApiResponse({
+  @GenericApiResponse({
     status: HttpStatus.CREATED,
     description: 'Move added successfully',
   })
-  @ApiResponse({
+  @GenericApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid data provided',
   })
-  @ApiResponse({
+  @GenericApiResponse({
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized access',
   })
@@ -192,6 +199,35 @@ export class GameController implements IGameController {
     return {
       statusCode: HttpStatus.OK,
       message: 'Add move to game success!',
+    };
+  }
+
+  /**
+   * ============================ joinGame =================================
+   */
+  @ApiOperation({ summary: "User join a game"})
+  @GenericApiResponse({
+    status: HttpStatus.OK,
+    description: 'User joined successfully',
+  })
+  @GenericApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid data provided',
+  })
+  @GenericApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized access',
+  })
+  @Post(':id/join')
+  async join(
+    @Param('id', ParseUUIDPipe) gameId: string,
+    @JwtPayload() jwtPayload: TJwtPayload
+  ): Promise<HttpResponse<void>> {
+    await this._gameService.joinGame(gameId, jwtPayload.sub);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Success!',
     };
   }
 }

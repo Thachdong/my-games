@@ -1,17 +1,8 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsOptional, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNumber } from 'class-validator';
 
 export class CreateGameDto {
-  @ApiPropertyOptional({ description: 'The ID of the tournament' })
-  @IsOptional()
-  @IsString()
-  tournamentId?: string;
-
-  @ApiProperty({ description: 'The start time of the game' })
-  @IsDateString()
-  startTime: string;
-
-  @ApiProperty({ description: 'The end time of the game' })
-  @IsDateString()
-  endTime: string;
+  @ApiProperty({ description: 'The time of the game round in seconds' })
+  @IsNumber()
+  roundTime: number;
 }

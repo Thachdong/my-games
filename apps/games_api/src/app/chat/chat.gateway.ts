@@ -140,7 +140,7 @@ export class ChatGateway
     const user = await this._userService.getUserById(userId);
 
     if (user) {
-      await this._gameService.joinGame(gameId, user);
+      await this._gameService.joinGame(gameId, user.id);
 
       this._server.to(gameId).emit(ESubscribeEvents.USER_JOINED_GAME, {
         userId: user.id,
